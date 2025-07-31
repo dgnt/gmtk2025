@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 func _on_play_button_pressed():
 	print("Play button pressed! Starting game flow...")
 	# Tell the global GameFlow singleton to load the first level
-	GameFlow.load_level(0) # Load the level at index 0 (Level1.tscn)
+	GameFlow.start_new_game() # Load the level at index 0 (Level1.tscn)
 
 func _on_settings_button_pressed():
 	print("Settings button pressed! (Implement settings menu here)")
