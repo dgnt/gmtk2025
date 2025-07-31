@@ -24,14 +24,14 @@ func _physics_process(delta: float) -> void:
 	hooper.progress_ratio = rev
 	
 	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 		if lookup:
 			velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * bod.transform.x.x
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction := Input.get_axis("ui_left", "ui_right")
+	var direction := Input.get_axis("move_left", "move_right")
 	var hoop_h = 0
 	if not lookup:
 		hoop_h = -cos(rev*2*PI) * HOOP_SPEED
