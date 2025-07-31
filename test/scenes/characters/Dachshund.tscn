@@ -29,11 +29,15 @@ point_count = 4
 [node name="Dachshund" type="CharacterBody2D"]
 script = ExtResource("1_iti5u")
 
+[node name="polygons" type="Node2D" parent="."]
+
+[node name="Polygon2D" type="Polygon2D" parent="polygons"]
+texture = ExtResource("3_ed75f")
+
 [node name="Body" type="Node2D" parent="."]
 scale = Vector2(1.3, 1.3)
 
 [node name="Skeleton2D" type="Skeleton2D" parent="Body"]
-scale = Vector2(0.769231, 0.769231)
 
 [node name="Body" type="Bone2D" parent="Body/Skeleton2D"]
 
@@ -84,7 +88,7 @@ scale = Vector2(3.80859, 2.60254)
 polygon = PackedVector2Array(-11.0277, -136.405, 0.787692, -192.889, 24.4185, -204.8, 43.3231, -173.292, 11.8154, -36.1186, 32, 118, 22, 128, -22, 128, -32, 118)
 
 [node name="Path2D" type="Path2D" parent="."]
-scale = Vector2(1.3, 1.3)
+scale = Vector2(2, 2)
 curve = SubResource("Curve2D_ahy1o")
 
 [node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
