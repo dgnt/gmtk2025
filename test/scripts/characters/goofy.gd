@@ -7,6 +7,9 @@ const HOOP_SPEED = 300
 const STABILITY = 250
 var rev = 0
 var lookup = false
+var hypercharge = 0
+const CHARGE_TIME = 2000.0 # ms
+const FULL_CHARGE = 2.0
 
 func _physics_process(delta: float) -> void:
 	var bod = get_node("Body")
@@ -15,7 +18,13 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	else:
-		rev += delta * 1000 / REV_TIME
+		if Input.is_action_pressed("ui_down"):
+			hypercharge += delta * 1000
+			if hypercharge > CHARGE_TIME:
+				hypercharge = CHARGE_TIME
+		else:
+			hypercharge = 0
+		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
 		lookup = Input.is_action_pressed("ui_up")
 		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
@@ -34,9 +43,9 @@ func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	var hoop_h = 0
 	if not lookup:
-		hoop_h = -cos(rev*2*PI) * HOOP_SPEED
+		hoop_h = -cos(rev*2*PI) * HOOP_SPEED * (1 + hypercharge / CHARGE_TIME * FULL_CHARGE)
 		if is_on_floor():
-			if abs(hoop_h) < STABILITY:
+			if abs(hoop_h) < STABILITY or hypercharge > 0:
 				hoop_h = 0
 			elif hoop_h > 0:
 				hoop_h -= STABILITY
