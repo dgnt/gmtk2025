@@ -6,40 +6,56 @@ const REV_TIME = 800  # ms
 const HOOP_SPEED = 300
 const STABILITY = 250
 var rev = 0
+var lookup = false
+var hypercharge = 0
+const CHARGE_TIME = 2000.0 # ms
+const FULL_CHARGE = 2.0
 
 func _physics_process(delta: float) -> void:
+	var bod = get_node("Body")
+	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	else:
-		rev += delta * 1000 / REV_TIME * 2 * PI
-		while rev > 2 * PI:
-			rev -= 2 * PI
-	var hoop_v = -cos(rev) * HOOP_SPEED
-	var hooper = get_node("Path2D/PathFollow2D")
-	hooper.progress_ratio = rev / (2 * PI)
-	if is_on_floor():
-		if abs(hoop_v) < STABILITY:
-			hoop_v = 0
-		elif hoop_v > 0:
-			hoop_v -= STABILITY
+		if Input.is_action_pressed("ui_down"):
+			hypercharge += delta * 1000
+			if hypercharge > CHARGE_TIME:
+				hypercharge = CHARGE_TIME
 		else:
-			hoop_v += STABILITY
-		
-
+			hypercharge = 0
+		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
+		rev -= int(rev)
+		lookup = Input.is_action_pressed("ui_up")
+		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
+	
+	var hooper = get_node("Path2D/PathFollow2D")
+	hooper.progress_ratio = rev
+	
 	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
+		if lookup:
+			velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * bod.transform.x.x
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction := Input.get_axis("ui_left", "ui_right")
+	var direction := Input.get_axis("move_left", "move_right")
+	var hoop_h = 0
+	if not lookup:
+		hoop_h = -cos(rev*2*PI) * HOOP_SPEED * (1 + hypercharge / CHARGE_TIME * FULL_CHARGE)
+		if is_on_floor():
+			if abs(hoop_h) < STABILITY or hypercharge > 0:
+				hoop_h = 0
+			elif hoop_h > 0:
+				hoop_h -= STABILITY
+			else:
+				hoop_h += STABILITY
 	if direction:
-		velocity.x = direction * speed + hoop_v
+		velocity.x = direction * speed + hoop_h
 	else:
-		velocity.x = move_toward(velocity.x, hoop_v, speed)
+		velocity.x = move_toward(velocity.x, hoop_h, speed)
 	
-	var bod = get_node("Body")
 	if velocity.x < 0:
 		bod.transform.x = Vector2(-1, 0)
 	elif velocity.x > 0:
@@ -77,7 +93,6 @@ func sanify_pack(v2a: PackedVector2Array) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-
 	pass
 	
 	
