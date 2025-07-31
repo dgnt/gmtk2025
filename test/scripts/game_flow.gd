@@ -5,6 +5,14 @@ extends Node
 @export var level_paths: Array[String] = [
 	"res://scenes/Level1.tscn", # Your Level 1 scene
 	"res://scenes/Level2.tscn", # Your Level 2 scene
+	"res://scenes/Level3.tscn", # Your Level 3 scene
+	"res://scenes/Level4.tscn", # Your Level 4 scene
+	"res://scenes/Level5.tscn", # Your Level 5 scene
+	"res://scenes/Level6.tscn", # Your Level 6 scene
+	"res://scenes/Level7.tscn", # Your Level 7 scene
+	"res://scenes/Level8.tscn", # Your Level 8 scene
+	"res://scenes/Level9.tscn", # Your Level 9 scene
+	"res://scenes/Level10.tscn", # Your Level 10 scene
 	# Add more level paths here as you create them
 ]
 
