@@ -41,9 +41,9 @@ polygon = PackedVector2Array(56, 57, 46, 103, 46, 163, 59, 201, 83, 213, 116, 17
 curve = SubResource("Curve2D_opr5v")
 
 [node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
-position = Vector2(-140, 0)
+position = Vector2(-145, 0)
 rotation = 0.266252
-h_offset = -70.0
+h_offset = -75.0
 rotates = false
 
 [node name="Hoop" type="Node2D" parent="Path2D/PathFollow2D"]
