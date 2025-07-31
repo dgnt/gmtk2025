@@ -5,7 +5,7 @@ extends Control # Or Node2D if you didn't change the root
 @onready var canvas_modulate = $CanvasModulate
 
 # Define the path to your main game scene (Level1.tscn or MainMenu.tscn)
-const NEXT_SCENE_PATH = "res://Scenes/Level.tscn" # CHANGE THIS to your actual first game scene!
+const NEXT_SCENE_PATH = "res://scenes/Level.tscn" # CHANGE THIS to your actual first game scene!
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
