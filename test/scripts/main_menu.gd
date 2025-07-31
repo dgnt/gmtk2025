@@ -6,7 +6,7 @@ extends Control
 @onready var debug_button = $VBoxContainer/DebugButton
 
 # Define the path to your Level 1 scene
-const LEVEL_1_SCENE_PATH = "res://scenes/Level.tscn"
+#const LEVEL_1_SCENE_PATH = "res://scenes/Level.tscn"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -29,9 +29,14 @@ func _ready():
 func _process(delta: float) -> void:
 	pass
 
+#func _on_play_button_pressed():
+#	print("Play button pressed! Loading Level 1...")
+#	get_tree().change_scene_to_file(LEVEL_1_SCENE_PATH)
+	
 func _on_play_button_pressed():
-	print("Play button pressed! Loading Level 1...")
-	get_tree().change_scene_to_file(LEVEL_1_SCENE_PATH)
+	print("Play button pressed! Starting game flow...")
+	# Tell the global GameFlow singleton to load the first level
+	GameFlow.load_level(0) # Load the level at index 0 (Level1.tscn)
 
 func _on_settings_button_pressed():
 	print("Settings button pressed! (Implement settings menu here)")
