@@ -115,10 +115,22 @@ func _run():
 			var bounds = data["bounds"]
 			var center = Vector2(bounds["center"][0], bounds["center"][1])
 			var centered_points = PackedVector2Array()
+			var uv_points = PackedVector2Array()
+			
+			# Get texture size for UV mapping
+			var texture_size = texture.get_size()
+			
 			for point in points:
+				# Center the polygon points
 				centered_points.append(point - center)
+				
+				# UV coordinates should map to the full texture (0,0 to texture_size)
+				# Convert from absolute coordinates to texture-relative coordinates
+				var uv_point = Vector2(point[0], point[1])
+				uv_points.append(uv_point)
+			
 			poly.polygon = centered_points
-			poly.uv = centered_points
+			poly.uv = uv_points  # UV uses absolute texture coordinates
 		else:
 			poly.polygon = points
 			poly.uv = points
@@ -133,6 +145,11 @@ func _run():
 			poly.position = Vector2.ZERO
 		
 		poly.z_index = config["z_index"]
+		
+		# Set proper blend mode to avoid transparency artifacts
+		# Use "Mix" blend mode for proper alpha blending
+		poly.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		poly.show_behind_parent = false
 		
 		# Add to container
 		polygons_container.add_child(poly)
@@ -162,6 +179,9 @@ func _run():
 			var texture_center = texture_size / 2.0
 			var bounds_center_in_texture = Vector2(bounds["center"][0], bounds["center"][1])
 			sprite.offset = texture_center - bounds_center_in_texture
+		
+		# Hide sprites to avoid overlap artifacts with polygons
+		sprite.visible = false
 		
 		
 		sprites_container.add_child(sprite)
