@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cpm1imy0vcjij"]
+[gd_scene load_steps=14 format=3 uid="uid://cpm1imy0vcjij"]
 
 [ext_resource type="Script" path="res://scripts/characters/dachshund.gd" id="1_iti5u"]
 [ext_resource type="Texture2D" uid="uid://b43os3qi3e1ii" path="res://assets/sprites/dachshund/body.png" id="1_uyy5a"]
@@ -8,8 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://dm0l01v1c35i1" path="res://assets/sprites/dachshund/nose.png" id="5_nose"]
 [ext_resource type="Texture2D" uid="uid://bxjpwc1kxrbsd" path="res://assets/sprites/dachshund/ear-front.png" id="6_earfront"]
 [ext_resource type="Texture2D" uid="uid://diber08abwbkg" path="res://assets/sprites/dachshund/back-ear.png" id="7_earback"]
-[ext_resource type="Texture2D" uid="uid://cnnlml8roali8" path="res://assets/sprites/dachshund/arms.png" id="8_arms"]
-[ext_resource type="Texture2D" uid="uid://iisv5mv1vpfb" path="res://assets/sprites/dachshund/legs.png" id="9_legs"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="10_tail"]
 [ext_resource type="Script" path="res://scripts/characters/dachshund/camera.gd" id="12_kvgnf"]
 
@@ -72,13 +70,11 @@ texture = ExtResource("10_tail")
 rest = Transform2D(1, 0, 0, 1, -50, 100)
 
 [node name="Sprite2D" type="Sprite2D" parent="Body/Skeleton2D/BackLegs"]
-texture = ExtResource("9_legs")
 
 [node name="FrontArms" type="Bone2D" parent="Body/Skeleton2D"]
 rest = Transform2D(1, 0, 0, 1, 50, 80)
 
 [node name="Sprite2D" type="Sprite2D" parent="Body/Skeleton2D/FrontArms"]
-texture = ExtResource("8_arms")
 
 [node name="Head" type="Bone2D" parent="Body/Skeleton2D"]
 rest = Transform2D(1, 0, 0, 1, 100, -50)
