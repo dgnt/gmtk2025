@@ -13,7 +13,7 @@ var hypercharge = 0
 const CHARGE_TIME = 2000.0 # ms
 const FULL_CHARGE = 2.0
 var locked_skills = []
-const SKILLS = ["jump", "move_left", "move_right", "ui_up", "ui_down"]
+const SKILLS = ["jump", "move_left", "move_right", "move_up", "move_down"]
 
 func _physics_process(delta: float) -> void:
 	var bod = get_node("Body")
@@ -27,7 +27,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	else:
-		if "ui_down" in pressed:
+		if "move_down" in pressed:
 			hypercharge += delta * 1000
 			if hypercharge > CHARGE_TIME:
 				hypercharge = CHARGE_TIME
@@ -35,7 +35,7 @@ func _physics_process(delta: float) -> void:
 			hypercharge = 0
 		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
-		lookup = "ui_up" in pressed
+		lookup = "move_up" in pressed
 		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
 	
 	var hooper = get_node("Path2D/PathFollow2D")

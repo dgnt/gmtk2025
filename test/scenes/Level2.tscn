@@ -6,7 +6,7 @@
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_ak8h2"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_hh1ue"]
 
-[node name="Level" type="Node2D"]
+[node name="Level2" type="Node2D"]
 script = ExtResource("1_t7s5v")
 level_name = "A Thorny Situation"
 level_number = 2

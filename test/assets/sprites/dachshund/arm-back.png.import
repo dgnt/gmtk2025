@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnnlml8roali8"
-path="res://.godot/imported/arms.png-82feadea673c4d176a6427261e87fa1f.ctex"
+uid="uid://s2cxfohcu4t8"
+path="res://.godot/imported/arm-back.png-9f69fe80098656a14590ef10554d16ee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/dachshund/arms.png"
-dest_files=["res://.godot/imported/arms.png-82feadea673c4d176a6427261e87fa1f.ctex"]
+source_file="res://assets/sprites/dachshund/arm-back.png"
+dest_files=["res://.godot/imported/arm-back.png-9f69fe80098656a14590ef10554d16ee.ctex"]
 
 [params]
 

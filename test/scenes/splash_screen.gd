@@ -17,7 +17,7 @@ func _ready():
 		# Skips splash screen when running from editor
 		print("Skipping splash screen for editor run.")
 		# Immediately load the next scene
-		get_tree().change_scene_to_file(NEXT_SCENE_PATH)
+		get_tree().call_deferred("change_scene_to_file", NEXT_SCENE_PATH)
 		return # Exit _ready function early
 
 	# If not in editor, play the splash animation

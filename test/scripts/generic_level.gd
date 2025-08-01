@@ -48,9 +48,9 @@ func _input(event):
 func get_locked_skills():
 	match level_number:
 		1:
-			return ["ui_up", "ui_down"]
+			return ["move_up", "move_down"]
 		2:
-			return ["ui_up"]
+			return ["move_up"]
 		3:
 			return []
 		_:

@@ -6,7 +6,7 @@
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_jei7p"]
 [ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/WinZone.tscn" id="3_vntws"]
 
-[node name="Level" type="Node2D"]
+[node name="Level2" type="Node2D"]
 script = ExtResource("1_vs4qf")
 level_name = "It's a Dogg Life"
 level_number = 1
