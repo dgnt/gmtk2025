@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://bvxut8nyvk4fo"]
+
+[ext_resource type="PackedScene" uid="uid://b4nwmwnep3xc0" path="res://scenes/characters/GeneratedDachshund.tscn" id="1_test"]
+[ext_resource type="Script" path="res://scripts/systems/hula_hoop.gd" id="2_hoop"]
+
+[sub_resource type="Resource" id="Resource_test_hoop"]
+script = ExtResource("2_hoop")
+position = 0.5
+radius = 40.0
+speed = 3.0
+phase = 0.0
+influence_range = 0.3
+intensity = 1.0
+ellipse_ratio = 0.6
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2000, 50)
+
+[node name="HulaHoopTest" type="Node2D"]
+
+[node name="GeneratedDachshund" parent="." instance=ExtResource("1_test")]
+position = Vector2(500, 300)
+
+[node name="HulaHoopSystem" parent="GeneratedDachshund" index="5"]
+hoop = SubResource("Resource_test_hoop")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(500, 400)
+
+[node name="Label" type="Label" parent="."]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 600.0
+offset_bottom = 100.0
+text = "Hula Hoop Test Scene
+The LowerSpine bone should be moving in an elliptical pattern
+Press ESC to quit"
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(500, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="ColorRect" type="ColorRect" parent="Floor"]
+offset_left = -1000.0
+offset_top = -25.0
+offset_right = 1000.0
+offset_bottom = 25.0
+color = Color(0.3, 0.3, 0.3, 1)
+
+[editable path="GeneratedDachshund"]

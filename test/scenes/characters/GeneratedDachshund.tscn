@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b4nwmwnep3xc0"]
+[gd_scene load_steps=19 format=3 uid="uid://b4nwmwnep3xc0"]
 
 [ext_resource type="Script" path="res://scripts/characters/generated_dachshund.gd" id="1_bsuya"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="2_pd77d"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://bxjpwc1kxrbsd" path="res://assets/sprites/dachshund/ear-front.png" id="11_oisix"]
 [ext_resource type="Texture2D" uid="uid://bu6chihgw2kxi" path="res://assets/sprites/dachshund/face.png" id="12_4x46p"]
 [ext_resource type="Texture2D" uid="uid://dm0l01v1c35i1" path="res://assets/sprites/dachshund/nose.png" id="13_cemn3"]
+[ext_resource type="Script" path="res://scripts/systems/hula_hoop_system.gd" id="14_hula_system"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmv6e"]
 radius = 140.0
@@ -318,3 +319,6 @@ rest = Transform2D(1, 0, 0, 1, 114, 21)
 libraries = {
 "": SubResource("AnimationLibrary_iletf")
 }
+
+[node name="HulaHoopSystem" type="Node2D" parent="."]
+script = ExtResource("14_hula_system")
