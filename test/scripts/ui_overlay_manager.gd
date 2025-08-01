@@ -43,6 +43,9 @@ func create_fullscreen_button():
 	fullscreen_button.text = "⛶"  # Fullscreen symbol
 	fullscreen_button.custom_minimum_size = Vector2(40, 40)
 	
+	# Make button click-only (not keyboard navigable)
+	fullscreen_button.focus_mode = Control.FOCUS_NONE
+	
 	# Position in top-right corner with some padding
 	fullscreen_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	fullscreen_button.position.x -= 50  # 10px padding from right edge
