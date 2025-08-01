@@ -18,4 +18,5 @@ mono_crash.*.json
 # Mac
 *.DS_Store
 
+test/builds
 screenshots/
