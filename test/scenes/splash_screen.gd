@@ -13,7 +13,8 @@ func _ready():
 	# Engine.is_editor_hint() is true when running in the Godot editor.
 	# OS.is_debug_build() is true when exported as a debug build.
 	# Use whichever makes more sense for your workflow.
-	if Engine.is_editor_hint(): # Skips splash screen when running from editor
+	if OS.is_debug_build(): # This works for both editor AND local debug builds
+		# Skips splash screen when running from editor
 		print("Skipping splash screen for editor run.")
 		# Immediately load the next scene
 		get_tree().change_scene_to_file(NEXT_SCENE_PATH)
