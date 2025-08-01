@@ -101,6 +101,7 @@ func _ready() -> void:
 	start_pos = position
 	# make_torso()
 	# make_head()
+	print("Hitbox size is ", get_hitbox_dimensions())
 	pass # Replace with function body.
 
 func sane_coord(point: Vector2) -> Vector2:
@@ -119,6 +120,18 @@ func _on_body_entered(body: Node2D):
 	if body.get_collision_layer_bit(2):
 		position = start_pos
 	pass
+	
+func get_hitbox_dimensions():
+	var top = $CollisionPolygon2D.polygon[0].y
+	var bot = $CollisionPolygon2D.polygon[0].y
+	var left = $CollisionPolygon2D.polygon[0].x
+	var right = $CollisionPolygon2D.polygon[0].x
+	for point in $CollisionPolygon2D.polygon:
+		top = min(top, point.y)
+		bot = max(bot, point.y)
+		left = min(left, point.x)
+		right = max(right, point.x)
+	return Vector2($CollisionPolygon2D.scale.x*(bot-top), $CollisionPolygon2D.scale.y*(right-left))
 	
 func make_head() -> void:
 	var top = HEIGHT/2 - TOP_HEAD
