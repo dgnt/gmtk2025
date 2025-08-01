@@ -42,7 +42,7 @@ func load_level(index: int):
 	else:
 		print("GameFlow: No more levels or invalid level index: ", index)
 		# Handle game finished / back to main menu / credits here
-		get_tree().change_scene_to_file("res://Scenes/UI/MainMenu.tscn") # Example: Go back to main menu
+		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn") # Example: Go back to main menu
 
 # This method will be called by each level when it's ready and has found its WinZone
 func register_level_completion(win_zone_node):

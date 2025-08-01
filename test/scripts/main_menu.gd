@@ -47,3 +47,13 @@ func _on_debug_button_pressed():
 	print("Debug button pressed! (Implement debug options here)")
 	# Example: Toggle a debug overlay, print game state, etc.
 	# This code will only run if the button is visible/active.
+	# Load the debug menu scene as an overlay
+	var debug_menu_scene = preload("res://scenes/ui/DebugMenu.tscn")
+	var debug_menu_instance = debug_menu_scene.instantiate()
+	
+	# Add it as a child of the current scene (overlay)
+	get_tree().current_scene.add_child(debug_menu_instance)
+	
+	# Optional: Pause the main menu or dim the background
+	# get_tree().paused = true
+	# modulate = Color(0.5, 0.5, 0.5, 1.0)  # Dim the main menu
