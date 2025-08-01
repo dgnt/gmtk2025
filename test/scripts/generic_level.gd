@@ -24,9 +24,14 @@ func _ready():
 	print("Level: ", scene_file_path, " is ready")
 
 func _input(event):
-	# Debug win shortcut - only works in debug builds
-	if OS.is_debug_build():
-		if event is InputEventKey and event.pressed:
+	if event is InputEventKey and event.pressed:
+		# Level restart shortcut - works in both debug and release builds
+		if event.keycode == KEY_R and event.shift_pressed:
+			print("Shift+R pressed - restarting current level!")
+			GameFlow.restart_current_level()
+		
+		# Debug win shortcut - only works in debug builds
+		if OS.is_debug_build():
 			if event.keycode == KEY_W and event.shift_pressed:
 				print("Debug: Shift+W pressed - triggering level win!")
 				if win_zone_ref:
