@@ -10,15 +10,22 @@ var lookup = false
 var hypercharge = 0
 const CHARGE_TIME = 2000.0 # ms
 const FULL_CHARGE = 2.0
+var locked_skills = []
+const SKILLS = ["jump", "move_left", "move_right", "ui_up", "ui_down"]
 
 func _physics_process(delta: float) -> void:
 	var bod = get_node("Body")
+	var pressed = []
+	for action in SKILLS:
+		if action not in locked_skills and Input.is_action_pressed(action):
+			pressed.append(action)
+		
 	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	else:
-		if Input.is_action_pressed("ui_down"):
+		if "ui_down" in pressed:
 			hypercharge += delta * 1000
 			if hypercharge > CHARGE_TIME:
 				hypercharge = CHARGE_TIME
@@ -26,14 +33,14 @@ func _physics_process(delta: float) -> void:
 			hypercharge = 0
 		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
-		lookup = Input.is_action_pressed("ui_up")
+		lookup = "ui_up" in pressed
 		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
 	
 	var hooper = get_node("Path2D/PathFollow2D")
 	hooper.progress_ratio = rev
 	
 	# Handle jump.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if "jump" in pressed and is_on_floor():
 		velocity.y = jump_velocity
 		if lookup:
 			velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * bod.transform.x.x
@@ -51,7 +58,7 @@ func _physics_process(delta: float) -> void:
 				hoop_h -= STABILITY
 			else:
 				hoop_h += STABILITY
-	if direction:
+	if direction and "move_left" not in locked_skills and "move_right" not in locked_skills:
 		velocity.x = direction * speed + hoop_h
 	else:
 		velocity.x = move_toward(velocity.x, hoop_h, speed)
@@ -78,12 +85,10 @@ const TORSO_NAME = "Torso"
 const BELLY_NAME = "Belly"
 const BODY_NAME = "Body"
 @onready var facing_forward = true
-var disabled = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	disabled = get_parent().get_locked_skills()
-	print(disabled)
+	locked_skills = get_parent().get_locked_skills()
 	# make_torso()
 	# make_head()
 	pass # Replace with function body.
