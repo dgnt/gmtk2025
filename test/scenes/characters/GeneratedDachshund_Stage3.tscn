@@ -190,42 +190,56 @@ offset = Vector2(-296, 362)
 
 [node name="CenterBone" type="Bone2D" parent="Skeleton2D"]
 position = Vector2(-17, 0)
+rest = Transform2D(1, 0, 0, 1, -17, 0)
 
 [node name="LowerSpine" type="Bone2D" parent="Skeleton2D/CenterBone"]
 position = Vector2(-3, 131)
+rest = Transform2D(1, 0, 0, 1, -3, 131)
 
 [node name="RearTailbone" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine"]
 position = Vector2(-1, 104)
+rest = Transform2D(1, 0, 0, 1, -1, 104)
 
 [node name="FrontHip" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone"]
 position = Vector2(44, 23)
+rest = Transform2D(1, 0, 0, 1, 44, 23)
 
 [node name="FrontAnkle" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone/FrontHip"]
 position = Vector2(33, 98)
+rest = Transform2D(1, 0, 0, 1, 33, 98)
 
 [node name="FrontFoot" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone/FrontHip/FrontAnkle"]
 position = Vector2(47, -7)
+rest = Transform2D(1, 0, 0, 1, 47, -7)
 
 [node name="RearHip" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone"]
 position = Vector2(-69, 32)
+rest = Transform2D(1, 0, 0, 1, -69, 32)
 
 [node name="RearAnkle" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone/RearHip"]
 position = Vector2(-14, 109)
+rest = Transform2D(1, 0, 0, 1, -14, 109)
 
 [node name="RearFoot" type="Bone2D" parent="Skeleton2D/CenterBone/LowerSpine/RearTailbone/RearHip/RearAnkle"]
 position = Vector2(58, 14)
+rest = Transform2D(1, 0, 0, 1, 58, 14)
 
 [node name="LowerChest" type="Bone2D" parent="Skeleton2D/CenterBone"]
 position = Vector2(11, -103)
+rest = Transform2D(1, 0, 0, 1, 11, -103)
 
 [node name="Chest" type="Bone2D" parent="Skeleton2D/CenterBone/LowerChest"]
 position = Vector2(21, -104)
+rest = Transform2D(1, 0, 0, 1, 21, -104)
 
 [node name="Neck" type="Bone2D" parent="Skeleton2D/CenterBone/LowerChest/Chest"]
 position = Vector2(21, -103)
+rest = Transform2D(1, 0, 0, 1, 21, -103)
 
 [node name="Head" type="Bone2D" parent="Skeleton2D/CenterBone/LowerChest/Chest/Neck"]
 position = Vector2(25, -72)
+rest = Transform2D(1, 0, 0, 1, 25, -72)
 
 [node name="Snout" type="Bone2D" parent="Skeleton2D/CenterBone/LowerChest/Chest/Neck/Head"]
 position = Vector2(114, 21)
+rest = Transform2D(1, 0, 0, 1, 114, 21)
