@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://pbu347gqchpl"]
+[gd_scene load_steps=16 format=3 uid="uid://cpm1imy0vcjij"]
 
 [ext_resource type="Script" path="res://scripts/characters/dachshund.gd" id="1_iti5u"]
 [ext_resource type="Texture2D" uid="uid://b43os3qi3e1ii" path="res://assets/sprites/dachshund/body.png" id="1_uyy5a"]
@@ -9,10 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bxjpwc1kxrbsd" path="res://assets/sprites/dachshund/ear-front.png" id="6_earfront"]
 [ext_resource type="Texture2D" uid="uid://diber08abwbkg" path="res://assets/sprites/dachshund/back-ear.png" id="7_earback"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="10_tail"]
-[ext_resource type="Texture2D" uid="uid://cfjtmrh14as8k" path="res://assets/sprites/dachshund/arm-front.png" id="12_csbbx"]
-[ext_resource type="Texture2D" uid="uid://s2cxfohcu4t8" path="res://assets/sprites/dachshund/arm-back.png" id="13_0c6eb"]
-[ext_resource type="Texture2D" uid="uid://dhy6nd502itxo" path="res://assets/sprites/dachshund/leg-back.png" id="14_r0mrc"]
-[ext_resource type="Texture2D" uid="uid://beqqonveuxptm" path="res://assets/sprites/dachshund/leg-front.png" id="15_hkhwb"]
+[ext_resource type="Script" path="res://scripts/characters/dachshund/camera.gd" id="12_kvgnf"]
 
 [sub_resource type="Curve2D" id="Curve2D_ahy1o"]
 _data = {
@@ -223,52 +220,8 @@ points = PackedVector2Array(319, 107, 349, 92, 417, 82, 446, 91, 487, 105)
 width_curve = SubResource("Curve_sefex")
 default_color = Color(0.556863, 0.121569, 0.141176, 1)
 
-[node name="sprites" type="Node2D" parent="."]
-metadata/_edit_lock_ = true
-
-[node name="Tail" type="Sprite2D" parent="sprites"]
-texture = ExtResource("10_tail")
-metadata/_edit_lock_ = true
-
-[node name="BackEar" type="Sprite2D" parent="sprites"]
-texture = ExtResource("7_earback")
-metadata/_edit_lock_ = true
-
-[node name="HeadBase" type="Sprite2D" parent="sprites"]
-texture = ExtResource("3_ed75f")
-region_rect = Rect2(268.778, 17.8699, 373.183, 217.326)
-metadata/_edit_lock_ = true
-
-[node name="FrontEar" type="Sprite2D" parent="sprites"]
-texture = ExtResource("6_earfront")
-metadata/_edit_lock_ = true
-
-[node name="Face" type="Sprite2D" parent="sprites"]
-texture = ExtResource("4_face")
-metadata/_edit_lock_ = true
-
-[node name="Nose" type="Sprite2D" parent="sprites"]
-texture = ExtResource("5_nose")
-metadata/_edit_lock_ = true
-
-[node name="Back" type="Sprite2D" parent="sprites"]
-texture = ExtResource("1_uyy5a")
-region_rect = Rect2(298.073, 844.768, 248.098, 625.412)
-metadata/_edit_lock_ = true
-
-[node name="Belly" type="Sprite2D" parent="sprites"]
-texture = ExtResource("2_kervg")
-region_rect = Rect2(298.073, 844.768, 248.098, 625.412)
-metadata/_edit_lock_ = true
-
-[node name="ArmFront" type="Sprite2D" parent="sprites"]
-texture = ExtResource("12_csbbx")
-
-[node name="ArmBack" type="Sprite2D" parent="sprites"]
-texture = ExtResource("13_0c6eb")
-
-[node name="LegBack" type="Sprite2D" parent="sprites"]
-texture = ExtResource("14_r0mrc")
-
-[node name="LegFront" type="Sprite2D" parent="sprites"]
-texture = ExtResource("15_hkhwb")
+[node name="Camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+script = ExtResource("12_kvgnf")

@@ -16,7 +16,7 @@ func _ready():
 	# OS.is_debug_build() is true for debug exports, false for release exports.
 	# Choose the one that best fits your "local testing/dev" definition.
 	# For simplicity, Engine.is_editor_hint() is often good for "dev only" features.
-	if Engine.is_editor_hint():
+	if OS.is_debug_build(): # This works for both editor AND local debug builds
 		debug_button.show() # Make the debug button visible
 		debug_button.set_process_mode(Node.PROCESS_MODE_INHERIT) # Ensure it's active
 		print("Debug button visible for editor build.")
@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 func _on_play_button_pressed():
 	print("Play button pressed! Starting game flow...")
 	# Tell the global GameFlow singleton to load the first level
-	GameFlow.load_level(0) # Load the level at index 0 (Level1.tscn)
+	GameFlow.start_new_game() # Load the level at index 0 (Level1.tscn)
 
 func _on_settings_button_pressed():
 	print("Settings button pressed! (Implement settings menu here)")
@@ -47,3 +47,13 @@ func _on_debug_button_pressed():
 	print("Debug button pressed! (Implement debug options here)")
 	# Example: Toggle a debug overlay, print game state, etc.
 	# This code will only run if the button is visible/active.
+	# Load the debug menu scene as an overlay
+	var debug_menu_scene = preload("res://scenes/ui/DebugMenu.tscn")
+	var debug_menu_instance = debug_menu_scene.instantiate()
+	
+	# Add it as a child of the current scene (overlay)
+	get_tree().current_scene.add_child(debug_menu_instance)
+	
+	# Optional: Pause the main menu or dim the background
+	# get_tree().paused = true
+	# modulate = Color(0.5, 0.5, 0.5, 1.0)  # Dim the main menu

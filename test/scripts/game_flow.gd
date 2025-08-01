@@ -3,43 +3,35 @@ extends Node
 
 # Define your level paths in order
 @export var level_paths: Array[String] = [
-	#"res://Scenes/Levels/Level1.tscn", # Your Level 1 scene
-	#"res://Scenes/Levels/Level2.tscn", # Your Level 2 scene
 	"res://scenes/Level1.tscn", # Your Level 1 scene
 	"res://scenes/Level2.tscn", # Your Level 2 scene
-	# Add more level paths here as you create them (e.g., "res://Scenes/Levels/Level3.tscn")
+	"res://scenes/Level3.tscn", # Your Level 3 scene
+	"res://scenes/Level4.tscn", # Your Level 4 scene
+	"res://scenes/Level5.tscn", # Your Level 5 scene
+	"res://scenes/Level6.tscn", # Your Level 6 scene
+	"res://scenes/Level7.tscn", # Your Level 7 scene
+	"res://scenes/Level8.tscn", # Your Level 8 scene
+	"res://scenes/Level9.tscn", # Your Level 9 scene
+	"res://scenes/Level10.tscn", # Your Level 10 scene
+	# Add more level paths here as you create them
 ]
+
+# Path to your game completion scene
+const GAME_COMPLETE_SCENE_PATH = "res://scenes/GameComplete.tscn"
 
 var current_level_index = -1 # -1 means no level loaded yet
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	# Connect to the scene_changed signal to re-connect to the WinZone
-	# This is important because the WinZone signal connection is per-scene and will be lost on scene change.
-	#get_tree().connect("scene_changed", Callable(self, "_on_scene_changed"))
-
-	if not get_tree().is_connected("scene_changed", Callable(self, "_on_scene_changed")):
-		get_tree().connect("scene_changed", Callable(self, "_on_scene_changed"))
-		print("GameFlow DEBUG: Successfully connected 'scene_changed' signal.")
-	else:
-		print("GameFlow DEBUG: 'scene_changed' signal already connected (expected on subsequent _ready calls if any).")
-
+	# No need to connect to deprecated scene_changed signal anymore!
+	
 	# If the game starts directly from a level (e.g., for testing),
 	# try to find its index. This is mostly for development convenience.
 	var initial_scene_path = get_tree().current_scene.scene_file_path
 	current_level_index = level_paths.find(initial_scene_path)
 	if current_level_index != -1:
 		print("GameFlow: Started at level ", current_level_index + 1)
-		# If starting directly in a level, try to connect to its WinZone if available
-		_connect_to_win_zone()
 	else:
 		print("GameFlow: Not starting in a defined level path. Current scene: ", initial_scene_path)
-		# If you start from MainMenu, this will be -1, which is fine.
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 
 func load_level(index: int):
 	if index >= 0 and index < level_paths.size():
@@ -50,28 +42,48 @@ func load_level(index: int):
 	else:
 		print("GameFlow: No more levels or invalid level index: ", index)
 		# Handle game finished / back to main menu / credits here
-		get_tree().change_scene_to_file("res://Scenes/UI/MainMenu.tscn") # Example: Go back to main menu
+		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn") # Example: Go back to main menu
+
+# This method will be called by each level when it's ready and has found its WinZone
+func register_level_completion(win_zone_node):
+	print("GameFlow: Level registered its WinZone for completion detection")
+	if win_zone_node and not win_zone_node.is_connected("level_completed", Callable(self, "_on_level_completed")):
+		win_zone_node.connect("level_completed", Callable(self, "_on_level_completed"))
+		print("GameFlow: Successfully connected to WinZone")
+	else:
+		print("GameFlow: Failed to connect to WinZone or already connected")
 
 func _on_level_completed():
 	print("GameFlow: Current level completed!")
-	load_level(current_level_index + 1)
-
-# This function is called by the scene_changed signal from the SceneTree
-func _on_scene_changed():
-	# Attempt to connect to the WinZone in the newly loaded scene
-	print("GameFlow DEBUG: Scene changed signal received. Attempting to connect WinZone in new scene.")
-	_connect_to_win_zone()
-
-func _connect_to_win_zone():
-	# Find the WinZone in the current scene and connect its signal
-	# We need to wait for the scene to be fully added to the tree
-	print("GameFlow DEBUG: _connect_to_win_zone function called.")
-	await get_tree().current_scene.ready
-
-	var win_zone = get_tree().current_scene.find_child("WinZone", true, false)
-	if win_zone:
-		if not win_zone.is_connected("level_completed", Callable(self, "_on_level_completed")):
-			win_zone.connect("level_completed", Callable(self, "_on_level_completed"))
-			print("GameFlow: Connected to WinZone in current level.")
+	# Check if this was the last level
+	if current_level_index + 1 >= level_paths.size():
+		print("GameFlow: That was the final level!")
+		load_game_complete_scene()
 	else:
-		print("GameFlow: No WinZone found in current level.")
+		load_level(current_level_index + 1)
+
+func load_game_complete_scene():
+	print("GameFlow: Loading game completion scene...")
+	get_tree().change_scene_to_file(GAME_COMPLETE_SCENE_PATH)
+
+# Optional: Method to start the game from level 1 (called from main menu)
+func start_new_game():
+	load_level(0)
+
+# Optional: Method to restart current level
+func restart_current_level():
+	if current_level_index >= 0:
+		load_level(current_level_index)
+	else:
+		print("GameFlow: No current level to restart")
+
+
+# Optional: Get current progress info
+func get_current_level_number() -> int:
+	return current_level_index + 1
+
+func get_total_levels() -> int:
+	return level_paths.size()
+
+func is_game_complete() -> bool:
+	return current_level_index >= level_paths.size() - 1
