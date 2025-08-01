@@ -16,6 +16,9 @@ extends Node
 	# Add more level paths here as you create them
 ]
 
+# Path to your game completion scene
+const GAME_COMPLETE_SCENE_PATH = "res://scenes/GameComplete.tscn"
+
 var current_level_index = -1 # -1 means no level loaded yet
 
 func _ready():
@@ -52,7 +55,16 @@ func register_level_completion(win_zone_node):
 
 func _on_level_completed():
 	print("GameFlow: Current level completed!")
-	load_level(current_level_index + 1)
+	# Check if this was the last level
+	if current_level_index + 1 >= level_paths.size():
+		print("GameFlow: That was the final level!")
+		load_game_complete_scene()
+	else:
+		load_level(current_level_index + 1)
+
+func load_game_complete_scene():
+	print("GameFlow: Loading game completion scene...")
+	get_tree().change_scene_to_file(GAME_COMPLETE_SCENE_PATH)
 
 # Optional: Method to start the game from level 1 (called from main menu)
 func start_new_game():
@@ -64,3 +76,14 @@ func restart_current_level():
 		load_level(current_level_index)
 	else:
 		print("GameFlow: No current level to restart")
+
+
+# Optional: Get current progress info
+func get_current_level_number() -> int:
+	return current_level_index + 1
+
+func get_total_levels() -> int:
+	return level_paths.size()
+
+func is_game_complete() -> bool:
+	return current_level_index >= level_paths.size() - 1
