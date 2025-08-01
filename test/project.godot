@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameFlow="*res://scripts/game_flow.gd"
+UIOverlay="*res://scripts/ui_overlay_manager.gd"
 
 [display]
 
