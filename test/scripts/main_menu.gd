@@ -16,7 +16,7 @@ func _ready():
 	# OS.is_debug_build() is true for debug exports, false for release exports.
 	# Choose the one that best fits your "local testing/dev" definition.
 	# For simplicity, Engine.is_editor_hint() is often good for "dev only" features.
-	if Engine.is_editor_hint():
+	if OS.is_debug_build(): # This works for both editor AND local debug builds
 		debug_button.show() # Make the debug button visible
 		debug_button.set_process_mode(Node.PROCESS_MODE_INHERIT) # Ensure it's active
 		print("Debug button visible for editor build.")
