@@ -53,6 +53,10 @@ func register_level_completion(win_zone_node):
 	else:
 		print("GameFlow: Failed to connect to WinZone or already connected")
 
+func register_player(player_node):
+	if player_node and not player_node.is_connected("level_failed", Callable(self, "_on_level_failed")):
+		player_node.connect("level_failed", Callable(self, "_on_level_failed"))
+
 func _on_level_completed():
 	print("GameFlow: Current level completed!")
 	# Check if this was the last level
@@ -62,6 +66,10 @@ func _on_level_completed():
 	else:
 		load_level(current_level_index + 1)
 
+func _on_level_failed():
+	print("GameFlow: Current level failed, restarting!")
+	load_level(current_level_index)
+	
 func load_game_complete_scene():
 	print("GameFlow: Loading game completion scene...")
 	get_tree().change_scene_to_file(GAME_COMPLETE_SCENE_PATH)

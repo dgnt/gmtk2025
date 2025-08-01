@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dmkmkvfa4egiy"]
+[gd_scene load_steps=4 format=3 uid="uid://duyxwsruqs545"]
 
 [ext_resource type="Script" path="res://scenes/win_zone.gd" id="1_glfuc"]
 [ext_resource type="Texture2D" uid="uid://cs7p6seuuxpj6" path="res://assets/images/rings.png" id="1_jkg6v"]
@@ -7,6 +7,8 @@
 size = Vector2(64, 64)
 
 [node name="WinZone" type="Area2D"]
+collision_layer = 0
+collision_mask = 4
 script = ExtResource("1_glfuc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -50,6 +50,12 @@ jump={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="mass"
+2d_physics/layer_2="enemy"
+2d_physics/layer_3="player"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

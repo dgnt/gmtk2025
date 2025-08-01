@@ -1,11 +1,13 @@
 extends CharacterBody2D
 
+signal level_failed
+
 @export var speed = 300.0
 @export var jump_velocity = -600.0
 const REV_TIME = 800  # ms
 const HOOP_SPEED = 300
 const STABILITY = 250
-var rev = 0
+var rev = 200
 var lookup = false
 var hypercharge = 0
 const CHARGE_TIME = 2000.0 # ms
@@ -69,7 +71,13 @@ func _physics_process(delta: float) -> void:
 		elif velocity.x > 0:
 			bod.transform.x = Vector2(1, 0)
 	move_and_slide()
-
+	
+	for i in range(get_slide_collision_count()):
+		var collider = get_slide_collision(i).get_collider()
+		if collider.name == "Spikes":
+			level_failed.emit()
+			set_deferred("monitoring", false) # Disable monitoring after first trigger
+			set_deferred("process_mode", Node.PROCESS_MODE_DISABLED) # Disable script processing
 
 const HEIGHT = 256 #px
 const WIDTH = 64 #px
@@ -85,10 +93,12 @@ const TORSO_NAME = "Torso"
 const BELLY_NAME = "Belly"
 const BODY_NAME = "Body"
 @onready var facing_forward = true
+var start_pos = Vector2(100,100)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	locked_skills = get_parent().get_locked_skills()
+	start_pos = position
 	# make_torso()
 	# make_head()
 	pass # Replace with function body.
@@ -103,7 +113,12 @@ func sanify_pack(v2a: PackedVector2Array) -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
-	
+
+func _on_body_entered(body: Node2D):
+	print("Collision!")
+	if body.get_collision_layer_bit(2):
+		position = start_pos
+	pass
 	
 func make_head() -> void:
 	var top = HEIGHT/2 - TOP_HEAD

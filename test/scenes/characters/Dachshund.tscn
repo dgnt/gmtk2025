@@ -28,6 +28,8 @@ _data = [Vector2(0.0346535, 0.714286), 0.0, 0.0, 0, 0, Vector2(0.386139, 0.42857
 point_count = 4
 
 [node name="Dachshund" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
 script = ExtResource("1_iti5u")
 
 [node name="polygons" type="Node2D" parent="."]

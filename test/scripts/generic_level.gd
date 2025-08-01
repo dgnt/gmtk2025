@@ -3,6 +3,7 @@
 extends Node2D  # or Node3D if you're using 3D
 
 @export var level_name = "Default"
+@export var level_number = 0
 var win_zone_ref = null  # Store reference to win zone
 
 func _ready():
@@ -19,6 +20,10 @@ func _ready():
 		print("Level: Found and registered WinZone with GameFlow")
 	else:
 		print("Level: Warning - No WinZone found in this level!")
+	
+	var player = find_child("Dachshund", true, false)
+	if player:
+		GameFlow.register_player(player)
 		
 	# You can add any other level-specific initialization here
 	print("Level: ", scene_file_path, " is ready")
@@ -41,12 +46,12 @@ func _input(event):
 					GameFlow._on_level_completed()
 
 func get_locked_skills():
-	match level_name:
-		"Level 1":
+	match level_number:
+		1:
 			return ["ui_up", "ui_down"]
-		"Level 2":
+		2:
 			return ["ui_up"]
-		"Level 3":
+		3:
 			return []
 		_:
 			return []
