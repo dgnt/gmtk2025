@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://pbu347gqchpl"]
+[gd_scene load_steps=17 format=3 uid="uid://pbu347gqchpl"]
 
 [ext_resource type="Script" path="res://scripts/characters/dachshund.gd" id="1_iti5u"]
 [ext_resource type="Texture2D" uid="uid://b43os3qi3e1ii" path="res://assets/sprites/dachshund/body.png" id="1_uyy5a"]
@@ -8,8 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://dm0l01v1c35i1" path="res://assets/sprites/dachshund/nose.png" id="5_nose"]
 [ext_resource type="Texture2D" uid="uid://bxjpwc1kxrbsd" path="res://assets/sprites/dachshund/ear-front.png" id="6_earfront"]
 [ext_resource type="Texture2D" uid="uid://diber08abwbkg" path="res://assets/sprites/dachshund/back-ear.png" id="7_earback"]
-[ext_resource type="Texture2D" uid="uid://cnnlml8roali8" path="res://assets/sprites/dachshund/arms.png" id="8_arms"]
-[ext_resource type="Texture2D" uid="uid://iisv5mv1vpfb" path="res://assets/sprites/dachshund/legs.png" id="9_legs"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="10_tail"]
 [ext_resource type="Texture2D" uid="uid://cfjtmrh14as8k" path="res://assets/sprites/dachshund/arm-front.png" id="12_csbbx"]
 [ext_resource type="Texture2D" uid="uid://s2cxfohcu4t8" path="res://assets/sprites/dachshund/arm-back.png" id="13_0c6eb"]
@@ -64,7 +62,6 @@ bones = ["hip", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 [node name="legs" type="Polygon2D" parent="polygons"]
 z_index = -1
 position = Vector2(-256.5, -815.5)
-texture = ExtResource("9_legs")
 skeleton = NodePath("../../Body/Skeleton2D")
 polygon = PackedVector2Array(539.5, 1712, 513.5, 1712, 491.5, 1706, 474, 1694.5, 464, 1675.5, 458, 1637.5, 458, 1608.5, 463, 1582.5, 476, 1558.5, 489.5, 1550, 504.5, 1551, 521, 1566.5, 525, 1575.5, 524, 1584.5, 516, 1592.5, 516, 1603.5, 508, 1619.5, 506, 1647.5, 514, 1663.5, 517.5, 1669, 532.5, 1673, 555.5, 1672, 562, 1675.5, 568, 1684.5, 567, 1696.5, 561.5, 1703, 539.5, 1712)
 uv = PackedVector2Array(539.5, 1712, 513.5, 1712, 491.5, 1706, 474, 1694.5, 464, 1675.5, 458, 1637.5, 458, 1608.5, 463, 1582.5, 476, 1558.5, 489.5, 1550, 504.5, 1551, 521, 1566.5, 525, 1575.5, 524, 1584.5, 516, 1592.5, 516, 1603.5, 508, 1619.5, 506, 1647.5, 514, 1663.5, 517.5, 1669, 532.5, 1673, 555.5, 1672, 562, 1675.5, 568, 1684.5, 567, 1696.5, 561.5, 1703, 539.5, 1712)
@@ -73,7 +70,6 @@ bones = ["hip", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 [node name="arms" type="Polygon2D" parent="polygons"]
 z_index = 1
 position = Vector2(-333.5, -321.5)
-texture = ExtResource("8_arms")
 skeleton = NodePath("../../Body/Skeleton2D")
 polygon = PackedVector2Array(687.5, 682, 682.5, 676, 674.5, 679, 666, 673.5, 668, 667.5, 678, 660.5, 678, 646.5, 670.5, 632, 657.5, 629, 632.5, 637, 627.5, 642, 625, 640.5, 629, 621.5, 636.5, 613, 661.5, 604, 679.5, 606, 687, 612.5, 697, 632.5, 699, 653.5, 709, 666.5, 701.5, 676, 687.5, 682)
 uv = PackedVector2Array(687.5, 682, 682.5, 676, 674.5, 679, 666, 673.5, 668, 667.5, 678, 660.5, 678, 646.5, 670.5, 632, 657.5, 629, 632.5, 637, 627.5, 642, 625, 640.5, 629, 621.5, 636.5, 613, 661.5, 604, 679.5, 606, 687, 612.5, 697, 632.5, 699, 653.5, 709, 666.5, 701.5, 676, 687.5, 682)

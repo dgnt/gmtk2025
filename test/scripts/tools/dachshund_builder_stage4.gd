@@ -29,24 +29,37 @@ func _run():
 	root.add_child(animation_player)
 	animation_player.owner = root
 	
-	# Create animations
-	create_idle_animation(animation_player, skeleton)
-	create_walk_animation(animation_player, skeleton)
-	create_run_animation(animation_player, skeleton)
-	create_jump_animation(animation_player, skeleton)
-	create_tail_wag_animation(animation_player, skeleton)
+	# Create AnimationLibrary (required in Godot 4)
+	var animation_library = AnimationLibrary.new()
 	
-	# Create AnimationTree for blending
-	var animation_tree = AnimationTree.new()
-	animation_tree.name = "AnimationTree"
-	animation_tree.anim_player = NodePath("../AnimationPlayer")
-	root.add_child(animation_tree)
-	animation_tree.owner = root
+	# Create animations and add to library
+	var idle_anim = create_idle_animation(animation_player, skeleton)
+	if idle_anim:
+		animation_library.add_animation("idle", idle_anim)
+	
+	var walk_anim = create_walk_animation(animation_player, skeleton)
+	if walk_anim:
+		animation_library.add_animation("walk", walk_anim)
+	
+	var run_anim = create_run_animation(animation_player, skeleton)
+	if run_anim:
+		animation_library.add_animation("run", run_anim)
+	
+	var jump_anim = create_jump_animation(animation_player, skeleton)
+	if jump_anim:
+		animation_library.add_animation("jump", jump_anim)
+	
+	var tail_wag_anim = create_tail_wag_animation(animation_player, skeleton)
+	if tail_wag_anim:
+		animation_library.add_animation("tail_wag", tail_wag_anim)
+	
+	# Add the library to the AnimationPlayer with empty name for default library
+	animation_player.add_animation_library("", animation_library)
 	
 	# Set default animation
-	animation_player.current_animation = "idle"
+	animation_player.assigned_animation = "idle"
 	
-	# Add script to root for controlling animations
+	# Add control script
 	var control_script = """extends CharacterBody2D
 
 @export var speed = 300.0
@@ -95,7 +108,11 @@ func _physics_process(delta):
 """
 	
 	# Save the control script
-	var script_path = "res://scripts/characters/generated_dachshund.gd"
+	var script_dir = "res://scripts/characters/"
+	if not DirAccess.dir_exists_absolute(script_dir):
+		DirAccess.make_dir_recursive_absolute(script_dir)
+	
+	var script_path = script_dir + "generated_dachshund.gd"
 	var script_file = FileAccess.open(script_path, FileAccess.WRITE)
 	script_file.store_string(control_script)
 	script_file.close()
@@ -106,7 +123,7 @@ func _physics_process(delta):
 	# Save the final scene
 	var new_packed_scene = PackedScene.new()
 	new_packed_scene.pack(root)
-	var save_path = "res://scenes/characters/GeneratedDachshund.tscn"
+	var save_path = "res://scenes/characters/GeneratedDachshund_Final.tscn"
 	var error = ResourceSaver.save(new_packed_scene, save_path)
 	
 	if error == OK:
@@ -133,160 +150,165 @@ func _physics_process(delta):
 	# Clean up
 	root.queue_free()
 
-func create_idle_animation(player: AnimationPlayer, skeleton: Skeleton2D):
+func create_idle_animation(player: AnimationPlayer, skeleton: Skeleton2D) -> Animation:
 	var anim = Animation.new()
 	anim.length = 2.0
 	anim.loop_mode = Animation.LOOP_LINEAR
 	
+	# Add body sway left to right
+	var body_sway_track = anim.add_track(Animation.TYPE_VALUE)
+	anim.track_set_path(body_sway_track, NodePath("Skeleton2D:CenterBone:rotation"))
+	anim.track_insert_key(body_sway_track, 0.0, 0.0)
+	anim.track_insert_key(body_sway_track, 0.5, deg_to_rad(-3.0))  # Sway left
+	anim.track_insert_key(body_sway_track, 1.0, 0.0)
+	anim.track_insert_key(body_sway_track, 1.5, deg_to_rad(3.0))   # Sway right
+	anim.track_insert_key(body_sway_track, 2.0, 0.0)
+	
+	# Get actual bone names from skeleton
+	var bone_names = ["CenterBone/LowerSpine", "CenterBone/LowerChest", "CenterBone/LowerChest/Chest", "CenterBone/LowerChest/Chest/Neck/Head"]
+	
 	# Subtle breathing motion on spine bones
-	for bone_name in ["Spine1", "Spine2", "Spine3", "Chest"]:
-		var bone = find_bone_by_name(skeleton, bone_name)
-		if not bone:
+	for bone_name in bone_names:
+		var bone_idx = skeleton.find_bone(bone_name)
+		if bone_idx == -1:
 			continue
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
-		anim.rotation_track_insert_key(track_idx, 0.0, 0.0)
-		anim.rotation_track_insert_key(track_idx, 1.0, deg_to_rad(2.0))
-		anim.rotation_track_insert_key(track_idx, 2.0, 0.0)
+			
+		var bone = skeleton.get_bone(bone_idx)
+		var track_idx = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_idx, NodePath("Skeleton2D:" + bone_name + ":rotation"))
+		anim.track_insert_key(track_idx, 0.0, 0.0)
+		anim.track_insert_key(track_idx, 1.0, deg_to_rad(2.0))
+		anim.track_insert_key(track_idx, 2.0, 0.0)
 	
-	# Head bob
-	var head = find_bone_by_name(skeleton, "Head")
-	if head:
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(head))
-		anim.rotation_track_insert_key(track_idx, 0.0, 0.0)
-		anim.rotation_track_insert_key(track_idx, 0.5, deg_to_rad(-3.0))
-		anim.rotation_track_insert_key(track_idx, 1.5, deg_to_rad(3.0))
-		anim.rotation_track_insert_key(track_idx, 2.0, 0.0)
-	
-	player.add_animation_library("", AnimationLibrary.new())
-	player.get_animation_library("").add_animation("idle", anim)
+	print("Created idle animation with " + str(anim.get_track_count()) + " tracks")
+	return anim
 
-func create_walk_animation(player: AnimationPlayer, skeleton: Skeleton2D):
+func create_walk_animation(player: AnimationPlayer, skeleton: Skeleton2D) -> Animation:
 	var anim = Animation.new()
-	anim.length = 0.8
+	anim.length = 1.0
 	anim.loop_mode = Animation.LOOP_LINEAR
 	
-	# Leg movement
-	var leg_bones = {
-		"FrontLegL": {"offset": 0.0, "angle": 25.0},
-		"FrontLegR": {"offset": 0.4, "angle": 25.0},
-		"BackLegL": {"offset": 0.2, "angle": 20.0},
-		"BackLegR": {"offset": 0.6, "angle": 20.0}
-	}
+	# Animate legs for walking
+	var leg_bones = [
+		"CenterBone/LowerSpine/RearTailbone/RearHip",
+		"CenterBone/LowerSpine/RearTailbone/RearHip/RearAnkle",
+		"CenterBone/LowerSpine/RearTailbone/FrontHip",
+		"CenterBone/LowerSpine/RearTailbone/FrontHip/FrontAnkle"
+	]
 	
-	for bone_name in leg_bones:
-		var bone = find_bone_by_name(skeleton, bone_name)
-		if not bone:
+	for i in range(leg_bones.size()):
+		var bone_name = leg_bones[i]
+		var bone_idx = skeleton.find_bone(bone_name)
+		if bone_idx == -1:
 			continue
-		var config = leg_bones[bone_name]
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
+			
+		var track_idx = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_idx, NodePath("Skeleton2D:" + bone_name + ":rotation"))
 		
-		var t1 = config["offset"]
-		var t2 = fmod(t1 + 0.2, anim.length)
-		var t3 = fmod(t1 + 0.4, anim.length)
-		var t4 = fmod(t1 + 0.6, anim.length)
-		
-		anim.rotation_track_insert_key(track_idx, t1, deg_to_rad(-config["angle"]))
-		anim.rotation_track_insert_key(track_idx, t2, 0.0)
-		anim.rotation_track_insert_key(track_idx, t3, deg_to_rad(config["angle"]))
-		anim.rotation_track_insert_key(track_idx, t4, 0.0)
+		# Offset for alternating leg movement
+		var offset = 0.5 if i % 2 == 0 else 0.0
+		anim.track_insert_key(track_idx, 0.0 + offset, deg_to_rad(-15.0))
+		anim.track_insert_key(track_idx, 0.25 + offset, deg_to_rad(15.0))
+		anim.track_insert_key(track_idx, 0.5 + offset, deg_to_rad(-15.0))
+		if offset > 0:
+			anim.track_insert_key(track_idx, 0.0, deg_to_rad(15.0))
+			anim.track_insert_key(track_idx, 1.0, deg_to_rad(-15.0))
 	
-	# Body sway
-	var spine2 = find_bone_by_name(skeleton, "Spine2")
-	if spine2:
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(spine2))
-		anim.rotation_track_insert_key(track_idx, 0.0, deg_to_rad(-3.0))
-		anim.rotation_track_insert_key(track_idx, 0.4, deg_to_rad(3.0))
-		anim.rotation_track_insert_key(track_idx, 0.8, deg_to_rad(-3.0))
+	# Add subtle body movement
+	var body_track = anim.add_track(Animation.TYPE_VALUE)
+	anim.track_set_path(body_track, NodePath("Skeleton2D:CenterBone:position"))
+	anim.track_insert_key(body_track, 0.0, Vector2(-17, 0))
+	anim.track_insert_key(body_track, 0.5, Vector2(-17, -5))
+	anim.track_insert_key(body_track, 1.0, Vector2(-17, 0))
 	
-	player.get_animation_library("").add_animation("walk", anim)
+	print("Created walk animation with " + str(anim.get_track_count()) + " tracks")
+	return anim
 
-func create_run_animation(player: AnimationPlayer, skeleton: Skeleton2D):
-	var anim = Animation.new()
-	anim.length = 0.4
-	anim.loop_mode = Animation.LOOP_LINEAR
-	
-	# Faster, more exaggerated leg movement
-	var leg_bones = {
-		"FrontLegL": {"offset": 0.0, "angle": 40.0},
-		"FrontLegR": {"offset": 0.2, "angle": 40.0},
-		"BackLegL": {"offset": 0.1, "angle": 35.0},
-		"BackLegR": {"offset": 0.3, "angle": 35.0}
-	}
-	
-	for bone_name in leg_bones:
-		var bone = find_bone_by_name(skeleton, bone_name)
-		if not bone:
-			continue
-		var config = leg_bones[bone_name]
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
-		
-		var t1 = config["offset"]
-		var t2 = fmod(t1 + 0.2, anim.length)
-		
-		anim.rotation_track_insert_key(track_idx, t1, deg_to_rad(-config["angle"]))
-		anim.rotation_track_insert_key(track_idx, t2, deg_to_rad(config["angle"]))
-	
-	player.get_animation_library("").add_animation("run", anim)
-
-func create_jump_animation(player: AnimationPlayer, skeleton: Skeleton2D):
-	var anim = Animation.new()
-	anim.length = 0.6
-	anim.loop_mode = Animation.LOOP_NONE
-	
-	# Compress body on takeoff
-	var spine_bones = ["Spine1", "Spine2", "Spine3"]
-	for i in range(spine_bones.size()):
-		var bone = find_bone_by_name(skeleton, spine_bones[i])
-		if not bone:
-			continue
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
-		anim.rotation_track_insert_key(track_idx, 0.0, 0.0)
-		anim.rotation_track_insert_key(track_idx, 0.1, deg_to_rad(10.0))
-		anim.rotation_track_insert_key(track_idx, 0.3, deg_to_rad(-5.0))
-		anim.rotation_track_insert_key(track_idx, 0.6, 0.0)
-	
-	# Legs extend
-	for leg in ["FrontLegL", "FrontLegR", "BackLegL", "BackLegR"]:
-		var bone = find_bone_by_name(skeleton, leg)
-		if not bone:
-			continue
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
-		anim.rotation_track_insert_key(track_idx, 0.0, 0.0)
-		anim.rotation_track_insert_key(track_idx, 0.1, deg_to_rad(30.0))
-		anim.rotation_track_insert_key(track_idx, 0.3, deg_to_rad(-20.0))
-		anim.rotation_track_insert_key(track_idx, 0.6, 0.0)
-	
-	player.get_animation_library("").add_animation("jump", anim)
-
-func create_tail_wag_animation(player: AnimationPlayer, skeleton: Skeleton2D):
+func create_run_animation(player: AnimationPlayer, skeleton: Skeleton2D) -> Animation:
 	var anim = Animation.new()
 	anim.length = 0.5
 	anim.loop_mode = Animation.LOOP_LINEAR
 	
-	var tail_bones = ["TailBase", "TailMid", "TailTip"]
-	for i in range(tail_bones.size()):
-		var bone = find_bone_by_name(skeleton, tail_bones[i])
-		if not bone:
-			continue
-		var track_idx = anim.add_track(Animation.TYPE_ROTATION_2D)
-		anim.track_set_path(track_idx, skeleton.get_path_to(bone))
-		var amplitude = 30.0 + i * 10.0  # Tip wags more
-		anim.rotation_track_insert_key(track_idx, 0.0, deg_to_rad(-amplitude))
-		anim.rotation_track_insert_key(track_idx, 0.25, deg_to_rad(amplitude))
-		anim.rotation_track_insert_key(track_idx, 0.5, deg_to_rad(-amplitude))
+	# Similar to walk but faster and more pronounced
+	var leg_bones = [
+		"CenterBone/LowerSpine/RearTailbone/RearHip",
+		"CenterBone/LowerSpine/RearTailbone/RearHip/RearAnkle",
+		"CenterBone/LowerSpine/RearTailbone/FrontHip",
+		"CenterBone/LowerSpine/RearTailbone/FrontHip/FrontAnkle"
+	]
 	
-	player.get_animation_library("").add_animation("tail_wag", anim)
+	for i in range(leg_bones.size()):
+		var bone_name = leg_bones[i]
+		var bone_idx = skeleton.find_bone(bone_name)
+		if bone_idx == -1:
+			continue
+			
+		var track_idx = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_idx, NodePath("Skeleton2D:" + bone_name + ":rotation"))
+		
+		var offset = 0.25 if i % 2 == 0 else 0.0
+		anim.track_insert_key(track_idx, 0.0 + offset, deg_to_rad(-25.0))
+		anim.track_insert_key(track_idx, 0.125 + offset, deg_to_rad(25.0))
+		anim.track_insert_key(track_idx, 0.25 + offset, deg_to_rad(-25.0))
+		if offset > 0:
+			anim.track_insert_key(track_idx, 0.0, deg_to_rad(25.0))
+			anim.track_insert_key(track_idx, 0.5, deg_to_rad(-25.0))
+	
+	# More pronounced body movement
+	var body_track = anim.add_track(Animation.TYPE_VALUE)
+	anim.track_set_path(body_track, NodePath("Skeleton2D:CenterBone:position"))
+	anim.track_insert_key(body_track, 0.0, Vector2(-17, 0))
+	anim.track_insert_key(body_track, 0.25, Vector2(-17, -10))
+	anim.track_insert_key(body_track, 0.5, Vector2(-17, 0))
+	
+	print("Created run animation with " + str(anim.get_track_count()) + " tracks")
+	return anim
 
-func find_bone_by_name(skeleton: Skeleton2D, bone_name: String) -> Bone2D:
-	for i in range(skeleton.get_bone_count()):
-		var bone = skeleton.get_bone(i)
-		if bone.name == bone_name:
-			return bone
-	return null
+func create_jump_animation(player: AnimationPlayer, skeleton: Skeleton2D) -> Animation:
+	var anim = Animation.new()
+	anim.length = 1.0
+	anim.loop_mode = Animation.LOOP_NONE
+	
+	# Compress body for jump preparation
+	var body_track = anim.add_track(Animation.TYPE_VALUE)
+	anim.track_set_path(body_track, NodePath("Skeleton2D:CenterBone:scale"))
+	anim.track_insert_key(body_track, 0.0, Vector2(1, 1))
+	anim.track_insert_key(body_track, 0.2, Vector2(1.1, 0.8))
+	anim.track_insert_key(body_track, 0.4, Vector2(0.9, 1.2))
+	anim.track_insert_key(body_track, 1.0, Vector2(1, 1))
+	
+	# Leg extension
+	var leg_bones = [
+		"CenterBone/LowerSpine/RearTailbone/RearHip",
+		"CenterBone/LowerSpine/RearTailbone/FrontHip"
+	]
+	
+	for bone_name in leg_bones:
+		var bone_idx = skeleton.find_bone(bone_name)
+		if bone_idx == -1:
+			continue
+			
+		var track_idx = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_idx, NodePath("Skeleton2D:" + bone_name + ":rotation"))
+		anim.track_insert_key(track_idx, 0.0, 0.0)
+		anim.track_insert_key(track_idx, 0.2, deg_to_rad(20.0))
+		anim.track_insert_key(track_idx, 0.4, deg_to_rad(-30.0))
+		anim.track_insert_key(track_idx, 1.0, 0.0)
+	
+	print("Created jump animation with " + str(anim.get_track_count()) + " tracks")
+	return anim
+
+func create_tail_wag_animation(player: AnimationPlayer, skeleton: Skeleton2D) -> Animation:
+	var anim = Animation.new()
+	anim.length = 0.5
+	anim.loop_mode = Animation.LOOP_LINEAR
+	
+	# Find tail polygon (it might not have a dedicated bone)
+	var tail_track = anim.add_track(Animation.TYPE_VALUE)
+	anim.track_set_path(tail_track, NodePath("Polygons/tail:rotation"))
+	anim.track_insert_key(tail_track, 0.0, deg_to_rad(-15.0))
+	anim.track_insert_key(tail_track, 0.25, deg_to_rad(15.0))
+	anim.track_insert_key(tail_track, 0.5, deg_to_rad(-15.0))
+	
+	print("Created tail wag animation with " + str(anim.get_track_count()) + " tracks")
+	return anim

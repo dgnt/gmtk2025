@@ -17,7 +17,7 @@
 radius = 40.0
 height = 200.0
 
-[node name="GeneratedDachshund" type="CharacterBody2D"]
+[node name="GeneratedDachshund2" type="CharacterBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5708
