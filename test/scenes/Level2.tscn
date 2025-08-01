@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://xe2lai8nlm84" path="res://icon.svg" id="1_0oy8o"]
 [ext_resource type="Script" path="res://scenes/level_2.gd" id="1_t7s5v"]
 [ext_resource type="PackedScene" uid="uid://djbfjacvglh8b" path="res://scenes/Player.tscn" id="2_xeihl"]
-[ext_resource type="PackedScene" path="res://scenes/WinZone.tscn" id="3_5thkd"]
+[ext_resource type="PackedScene" uid="uid://dmkmkvfa4egiy" path="res://scenes/WinZone.tscn" id="3_5thkd"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_hh1ue"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5qjiw"]
