@@ -44,3 +44,8 @@ func calc_camera_bounds():
 	if get_viewport().size.y > (limit_bottom - limit_top):
 		limit_top -= (get_viewport().size.y - (limit_bottom - limit_top))/2 + 1
 		limit_bottom += (get_viewport().size.y - (limit_bottom - limit_top))/2 + 1
+	
+	#print(limit_left)
+	#print(limit_right)
+	#print(limit_top)
+	#print(limit_bottom)
