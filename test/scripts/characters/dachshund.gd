@@ -78,9 +78,12 @@ const TORSO_NAME = "Torso"
 const BELLY_NAME = "Belly"
 const BODY_NAME = "Body"
 @onready var facing_forward = true
+var disabled = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	disabled = get_parent().get_locked_skills()
+	print(disabled)
 	# make_torso()
 	# make_head()
 	pass # Replace with function body.

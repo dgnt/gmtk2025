@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://pbu347gqchpl"]
+[gd_scene load_steps=16 format=3 uid="uid://cpm1imy0vcjij"]
 
 [ext_resource type="Script" path="res://scripts/characters/dachshund.gd" id="1_iti5u"]
 [ext_resource type="Texture2D" uid="uid://b43os3qi3e1ii" path="res://assets/sprites/dachshund/body.png" id="1_uyy5a"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://cnnlml8roali8" path="res://assets/sprites/dachshund/arms.png" id="8_arms"]
 [ext_resource type="Texture2D" uid="uid://iisv5mv1vpfb" path="res://assets/sprites/dachshund/legs.png" id="9_legs"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="10_tail"]
+[ext_resource type="Script" path="res://scripts/characters/dachshund/camera.gd" id="12_kvgnf"]
 
 [sub_resource type="Curve2D" id="Curve2D_ahy1o"]
 _data = {
@@ -131,3 +132,9 @@ position = Vector2(-399, -106)
 points = PackedVector2Array(319, 107, 349, 92, 417, 82, 446, 91, 487, 105)
 width_curve = SubResource("Curve_sefex")
 default_color = Color(0.556863, 0.121569, 0.141176, 1)
+
+[node name="Camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+script = ExtResource("12_kvgnf")

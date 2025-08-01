@@ -2,6 +2,8 @@
 # Attach this script to each level's root node
 extends Node2D  # or Node3D if you're using 3D
 
+@export var level_name = "Default"
+
 func _ready():
 	# Wait a frame to ensure all child nodes are fully initialized
 	await get_tree().process_frame
@@ -18,3 +20,14 @@ func _ready():
 		
 	# You can add any other level-specific initialization here
 	print("Level: ", scene_file_path, " is ready")
+
+func get_locked_skills():
+	match level_name:
+		"Level 1":
+			return ["ui_up", "ui_down"]
+		"Level 2":
+			return ["ui_up"]
+		"Level 3":
+			return []
+		_:
+			return []
