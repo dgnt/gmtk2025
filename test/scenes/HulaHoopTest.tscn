@@ -40,13 +40,14 @@ Press ESC to quit"
 position = Vector2(500, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+position = Vector2(4, 300)
 shape = SubResource("RectangleShape2D_floor")
 
 [node name="ColorRect" type="ColorRect" parent="Floor"]
-offset_left = -1000.0
-offset_top = -25.0
-offset_right = 1000.0
-offset_bottom = 25.0
-color = Color(0.3, 0.3, 0.3, 1)
+offset_left = -998.0
+offset_top = 275.0
+offset_right = 1002.0
+offset_bottom = 325.0
+color = Color(0.486201, 0.120187, 0.419877, 1)
 
 [editable path="GeneratedDachshund"]
