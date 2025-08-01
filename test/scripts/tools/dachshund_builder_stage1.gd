@@ -79,27 +79,12 @@ func _run():
 	
 	# Create Sprite2D nodes from the same sprite files
 	print("Creating Sprite2D nodes...")
-	var sprite_count = 0
-	for sprite_name in sprite_configs:
-		var texture_path = sprite_dir + sprite_name
-		var texture = load(texture_path) as Texture2D
-		if texture:
-			var sprite = Sprite2D.new()
-			sprite.name = sprite_name.get_basename().capitalize().replace("-", "")
-			sprite.texture = texture
-			
-			# Center the sprite and position it at origin
-			sprite.centered = true  # This centers the texture at the sprite's position
-			sprite.position = Vector2(0, 0)  # All sprites at origin
-			
-			sprites_container.add_child(sprite)
-			sprite.owner = root
-			sprite_count += 1
-		
-	print("Created " + str(sprite_count) + " Sprite2D nodes")
+	# We'll create sprites after polygons to match their positions
+	print("Sprite2D nodes will be created after polygons to match positions")
 	
 	# Process each sprite
 	var created_count = 0
+	var sprite_count = 0
 	for sprite_name in sprite_configs:
 		if not polygon_data.has(sprite_name):
 			print("WARNING: No polygon data for " + sprite_name)
@@ -155,6 +140,35 @@ func _run():
 		
 		created_count += 1
 		print("Created polygon: " + sprite_name + " (z-index: " + str(config["z_index"]) + ")")
+		
+		# Create corresponding Sprite2D with same position
+		var sprite = Sprite2D.new()
+		sprite.name = sprite_name.get_basename().capitalize().replace("-", "")
+		sprite.texture = texture
+		
+		# For sprites, we need to match how the polygon displays the texture
+		# The polygon uses centered coordinates relative to bounds center
+		# So the sprite should be positioned at the same location
+		sprite.centered = true
+		sprite.position = poly.position
+		
+		# However, we need to account for the fact that the polygon texture 
+		# is mapped to the polygon bounds, not the full texture
+		# Set the sprite's offset to match the polygon's texture mapping
+		if data.has("bounds"):
+			var bounds = data["bounds"]
+			var texture_size = texture.get_size()
+			# Calculate the offset between texture center and bounds center
+			var texture_center = texture_size / 2.0
+			var bounds_center_in_texture = Vector2(bounds["center"][0], bounds["center"][1])
+			sprite.offset = texture_center - bounds_center_in_texture
+		
+		
+		sprites_container.add_child(sprite)
+		sprite.owner = root
+		sprite_count += 1
+	
+	print("Created " + str(sprite_count) + " Sprite2D nodes with matching positions")
 	
 	# Save the scene
 	var packed_scene = PackedScene.new()
