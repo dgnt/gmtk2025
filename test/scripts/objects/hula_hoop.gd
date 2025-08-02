@@ -20,7 +20,7 @@ const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
 # Visual properties
 @export var color_front: Color = Color(1, 0.109804, 0.0588235, 1)  # Bright red
 @export var color_back: Color = Color(0.556863, 0.121569, 0.141176, 1)  # Dark red
-@export var line_width: float = 8.0
+@export var line_width: float = 25.0
 
 # References
 var skeleton_ref: Skeleton2D
