@@ -108,8 +108,6 @@ func _ready() -> void:
 	# If running scene in isolation, setup test environment
 	if get_tree().current_scene == self:
 		setup_test_environment()
-	else:
-		locked_skills = get_parent().get_locked_skills()
 	
 	start_pos = position
 	# make_torso()
@@ -267,12 +265,12 @@ func setup_test_environment():
 	print("Character position: ", position)
 	print("Floor Y: ", floor_y, " Character Y: ", char_y)
 	
-	# Add camera centered on character
-	var camera = Camera2D.new()
-	camera.enabled = true
-	camera.position = Vector2.ZERO  # Local to character
-	camera.zoom = Vector2(0.5, 0.5)  # Zoom out to see more
-	add_child(camera)
+	## Add camera centered on character
+	#var camera = Camera2D.new()
+	$Camera.enabled = true
+	$Camera.position = Vector2.ZERO  # Local to character
+	$Camera.zoom = Vector2(0.5, 0.5)  # Zoom out to see more
+	#add_child(camera)
 	
 	# Add background for reference
 	var background = ColorRect.new()
