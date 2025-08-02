@@ -5,8 +5,8 @@ signal level_failed
 @export var jump_velocity = -600.0
 
 @onready var skeleton = $Body/Skeleton2D
-@onready var hula_hoop_system = $HulaHoopSystem
 @onready var facing_forward = true
+var hula_hoop: HulaHoop = null
 
 const REV_TIME = 2800  # ms
 const HOOP_SPEED = 300
@@ -55,18 +55,19 @@ func _physics_process(delta: float) -> void:
 		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
 		lookup = "move_up" in pressed
-		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
+		
+		# Update hula hoop tilt when looking up
+		if hula_hoop:
+			hula_hoop.set_tilt_angle(0 if not lookup else bod.transform.x.x * -45)
 	
-	var hooper = get_node("Path2D/PathFollow2D")
-	hooper.progress_ratio = rev
-	
-	# Sync HulaHoopSystem with the rev variable
-	if hula_hoop_system and hula_hoop_system.hoop:
+	# Sync new hula hoop with the rev variable
+	if hula_hoop:
 		# Convert rev (0-1) to phase (0-TAU)
-		hula_hoop_system.hoop.phase = rev * TAU
+		hula_hoop.current_phase = rev * TAU
 		# Adjust speed based on hypercharge
 		var speed_multiplier = 1 + hypercharge / CHARGE_TIME * FULL_CHARGE
-		hula_hoop_system.hoop.speed = TAU / (REV_TIME / 1000.0) * speed_multiplier
+		hula_hoop.set_speed(1.0 / (REV_TIME / 1000.0) * speed_multiplier)
+	
 	
 	# Handle jump.
 	if "jump" in pressed and is_on_floor():
@@ -114,6 +115,10 @@ func _ready() -> void:
 	# make_torso()
 	# make_head()
 	print("Hitbox size is ", get_hitbox_dimensions())
+	
+	# Create a hula hoop using the factory
+	hula_hoop = HulaHoopFactory.create_basic_hoop(skeleton)
+	add_child(hula_hoop)
 	pass # Replace with function body.
 
 

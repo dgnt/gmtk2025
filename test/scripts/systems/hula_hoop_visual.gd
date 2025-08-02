@@ -54,8 +54,8 @@ func _process(_delta):
 	
 	# Calculate hoop position based on the hoop's current phase
 	var hoop = hoop_system.hoop
-	var x_offset = cos(hoop.phase) * hoop.radius * hoop.intensity
-	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio * hoop.intensity
+	var x_offset = cos(hoop.phase) * hoop.radius
+	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio
 	
 	# Position the hoop visual
 	global_position = bone_global_pos + Vector2(x_offset, y_offset + hoop_height_offset)
@@ -63,12 +63,8 @@ func _process(_delta):
 	# Rotate the hoop based on phase
 	rotation = hoop.phase * 0.2  # Slight rotation for visual interest
 	
-	# Update hoop scale based on intensity
-	var scale_factor = 1.0 + (hoop.intensity - 1.0) * 0.3
-	scale = Vector2(scale_factor, scale_factor)
-	
 	# Update particle position if exists
 	var particles = get_node_or_null("../ParticleEffects/Sparkles")
 	if particles:
 		particles.global_position = global_position
-		particles.emitting = hoop.intensity > 0.5
+		particles.emitting = true
