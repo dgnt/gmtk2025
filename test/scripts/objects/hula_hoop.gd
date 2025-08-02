@@ -278,7 +278,7 @@ func _process(_delta: float):
 		var x_offset = cos(current_phase) * (path_width / 2.0)
 		var y_offset = sin(current_phase) * (path_height / 2.0)
 		# No need to rotate offset since visual_node handles rotation
-		global_position = target_bone.global_position + Vector2(x_offset, y_offset)
+		global_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
 		
 
 # Public API methods

@@ -68,72 +68,6 @@ func _physics_process(delta: float) -> void:
 			die()
 	#print(position)
 	return
-	if is_on_floor():
-		control(delta)
-		#move_and_slide()
-		update_hoop()
-		return
-	else:
-		if hyper_airtime(delta): 
-			move_and_slide()
-			return
-		
-	
-	# Add the gravity.
-	if not is_on_floor():
-		velocity += get_gravity() * delta
-	else:
-		if "move_down" in pressed:
-			hypercharge += delta * 1000
-			if hypercharge > CHARGE_TIME:
-				hypercharge = CHARGE_TIME
-		else:
-			hypercharge = 0
-		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
-		rev -= int(rev)
-		lookup = "move_up" in pressed
-		if hoop_instance and hoop_instance.visual_node:
-			hoop_instance.visual_node.rotation = 0 if not lookup else bod.transform.x.x * -45
-	
-	# Update hoop phase
-	if hoop_instance:
-		hoop_instance.current_phase = rev * TAU
-	
-	# Handle jump.
-	if "jump" in pressed and is_on_floor():
-		velocity.y = jump_velocity
-		if lookup:
-			velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * bod.transform.x.x
-
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var hoop_h = 0
-	if not lookup:
-		hoop_h = -cos(rev*2*PI) * HOOP_SPEED * (1 + hypercharge / CHARGE_TIME * FULL_CHARGE)
-		if is_on_floor():
-			if abs(hoop_h) < STABILITY or hypercharge > 0:
-				hoop_h = 0
-			elif hoop_h > 0:
-				hoop_h -= STABILITY
-			else:
-				hoop_h += STABILITY
-	if direction and "move_left" not in locked_skills and "move_right" not in locked_skills:
-		velocity.x = direction * speed + hoop_h
-	else:
-		velocity.x = move_toward(velocity.x, hoop_h, speed)
-	
-	if direction:
-		if velocity.x < 0:
-			bod.transform.x = Vector2(-1, 0)
-		elif velocity.x > 0:
-			bod.transform.x = Vector2(1, 0)
-	move_and_slide()
-	
-	for i in range(get_slide_collision_count()):
-		var collider = get_slide_collision(i).get_collider()
-		if collider.name == "Spikes":
-			print("Should die")
-			die()
 
 func control(delta):
 	var pressed = []
@@ -185,15 +119,15 @@ func update_hoop():
 		hoop_instance.current_phase = rev * TAU
 
 func hoop_directing(direction):
-	if hoop_instance and hoop_instance.visual_node:
+	if hoop_instance and hoop_instance:
 		if direction:
-			hoop_instance.visual_node.rotation = direction.angle()
+			hoop_instance.rotation = direction.angle()
 		else:
-			hoop_instance.visual_node.rotation = (Vector2(1 if forward else -1,0)).angle()
-		if hoop_instance.visual_node.rotation > PI/2:
-			hoop_instance.visual_node.rotation -= PI
-		elif hoop_instance.visual_node.rotation < -PI/2:
-			hoop_instance.visual_node.rotation += PI
+			hoop_instance.rotation = (Vector2(1 if forward else -1,0)).angle()
+		if hoop_instance.rotation > PI/2:
+			hoop_instance.rotation -= PI
+		elif hoop_instance.rotation < -PI/2:
+			hoop_instance.rotation += PI
 	
 func rubber_snap(direction):
 	if air_snaps <= 0: return
@@ -247,8 +181,8 @@ func start_heli():
 		# Change target bone to head for helicopter effect
 		hoop_instance.set_target_bone(HELICOPTER_HOOP_TARGET)
 		# Reset visual rotation and position - hoop will follow head automatically
-		if hoop_instance.visual_node:
-			hoop_instance.visual_node.rotation = 0
+		if hoop_instance:
+			hoop_instance.rotation = 0
 		hoop_instance.position = Vector2.ZERO
 
 func heli_rev(delta):
@@ -322,15 +256,17 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
 		if hypercharge >= CHARGE_TIME:
-			if ($Body.transform.x.x > 0 and old_rev < 0.5 and rev > 0.5):
-				rev = 0.5
-				hyperdirection = direction
-				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
-			elif ($Body.transform.x.x < 0 and rev < old_rev):
+			if ($Body.transform.x.x > 0 and rev < old_rev):
 				rev = 0
 				hyperdirection = direction
 				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
+			elif ($Body.transform.x.x < 0 and old_rev < 0.5 and rev > 0.5):
+				rev = 0.5
+				hyperdirection = direction
+				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
 				# TODO: Punish hypercharging into the ground
+			else:
+				hypercharge = CHARGE_TIME
 		return true
 	else:
 		hypercharge -= delta * 1000.0
@@ -392,7 +328,7 @@ func get_hoop_force():
 	return cos(rev * 2 * PI)
 
 func get_hoop_direction():
-	return Vector2(1,0).rotated(hoop_instance.visual_node.rotation)
+	return Vector2(1,0).rotated(hoop_instance.rotation)
 
 const HEIGHT = 256 #px
 const WIDTH = 64 #px
