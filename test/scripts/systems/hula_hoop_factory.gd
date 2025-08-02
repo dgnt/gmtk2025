@@ -8,17 +8,26 @@ static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHo
 	var hoop_instance = hoop_scene.instantiate() as HulaHoop
 	
 	# Apply parameters
-	if params.has("radius"):
-		hoop_instance.radius = params.radius
+	if params.has("path_width"):
+		hoop_instance.path_width = params.path_width
 	
-	if params.has("speed"):
-		hoop_instance.speed = params.speed
+	if params.has("path_height"):
+		hoop_instance.path_height = params.path_height
+	
+	if params.has("hoop_width"):
+		hoop_instance.hoop_width = params.hoop_width
+	
+	if params.has("hoop_height"):
+		hoop_instance.hoop_height = params.hoop_height
+	
+	if params.has("speed_multiplier"):
+		hoop_instance.speed_multiplier = params.speed_multiplier
 	
 	if params.has("target_bone_path"):
 		hoop_instance.target_bone_path = params.target_bone_path
 	
 	if params.has("tilt_angle"):
-		hoop_instance.tilt_angle = clamp(params.tilt_angle, -45.0, 45.0)
+		hoop_instance.tilt_angle = clamp(params.tilt_angle, -89.0, 89.0)
 	
 	if params.has("ellipse_ratio"):
 		hoop_instance.ellipse_ratio = params.ellipse_ratio
@@ -40,16 +49,22 @@ static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHo
 # Preset factory methods for common hoop types
 static func create_basic_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"radius": 80.0,
-		"speed": 1.0,
+		"path_width": 80.0,
+		"path_height": 48.0,
+		"hoop_width": 20.0,
+		"hoop_height": 12.0,
+		"speed_multiplier": 1.0,
 		"color_front": Color.RED,
 		"color_back": Color.DARK_RED
 	})
 
 static func create_large_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"radius": 120.0,
-		"speed": 0.8,
+		"path_width": 120.0,
+		"path_height": 72.0,
+		"hoop_width": 30.0,
+		"hoop_height": 18.0,
+		"speed_multiplier": 0.8,
 		"color_front": Color.BLUE,
 		"color_back": Color.DARK_BLUE,
 		"line_width": 10.0
@@ -57,8 +72,11 @@ static func create_large_hoop(skeleton: Skeleton2D) -> HulaHoop:
 
 static func create_small_fast_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"radius": 60.0,
-		"speed": 2.0,
+		"path_width": 60.0,
+		"path_height": 36.0,
+		"hoop_width": 15.0,
+		"hoop_height": 9.0,
+		"speed_multiplier": 2.0,
 		"color_front": Color.YELLOW,
 		"color_back": Color.ORANGE,
 		"line_width": 6.0
@@ -66,8 +84,11 @@ static func create_small_fast_hoop(skeleton: Skeleton2D) -> HulaHoop:
 
 static func create_tilted_hoop(skeleton: Skeleton2D, tilt: float = 20.0) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"radius": 90.0,
-		"speed": 1.2,
+		"path_width": 90.0,
+		"path_height": 54.0,
+		"hoop_width": 22.0,
+		"hoop_height": 13.0,
+		"speed_multiplier": 1.2,
 		"tilt_angle": tilt,
 		"color_front": Color.MAGENTA,
 		"color_back": Color.PURPLE
@@ -80,9 +101,13 @@ static func create_hoop_set(skeleton: Skeleton2D, count: int = 3, spacing: float
 	var speed_increment = 0.2
 	
 	for i in range(count):
+		var width = base_radius + (i * spacing)
 		var hoop = create_hoop(skeleton, {
-			"radius": base_radius + (i * spacing),
-			"speed": 1.0 + (i * speed_increment),
+			"path_width": width,
+			"path_height": width * 0.6,
+			"hoop_width": 20.0,
+			"hoop_height": 12.0,
+			"speed_multiplier": 1.0 + (i * speed_increment),
 			"color_front": Color.from_hsv(float(i) / count, 1.0, 1.0),
 			"color_back": Color.from_hsv(float(i) / count, 1.0, 0.5)
 		})

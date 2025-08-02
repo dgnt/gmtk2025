@@ -8,9 +8,9 @@ signal level_failed
 @onready var facing_forward = true
 var hula_hoop: HulaHoop = null
 
-const REV_TIME = 2800  # ms
+const REV_TIME = 800
 const HOOP_SPEED = 300
-const STABILITY = 250
+const STABILITY = 1250
 var rev = 200
 var lookup = false
 var hypercharge = 0
@@ -52,7 +52,8 @@ func _physics_process(delta: float) -> void:
 				hypercharge = CHARGE_TIME
 		else:
 			hypercharge = 0
-		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
+		var speed_mult = hula_hoop.get_speed_multiplier() if hula_hoop else 1.0
+		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE) * speed_mult
 		rev -= int(rev)
 		lookup = "move_up" in pressed
 		
@@ -64,9 +65,10 @@ func _physics_process(delta: float) -> void:
 	if hula_hoop:
 		# Convert rev (0-1) to phase (0-TAU)
 		hula_hoop.current_phase = rev * TAU
-		# Adjust speed based on hypercharge
-		var speed_multiplier = 1 + hypercharge / CHARGE_TIME * FULL_CHARGE
-		hula_hoop.set_speed(1.0 / (REV_TIME / 1000.0) * speed_multiplier)
+		# Adjust speed based on hypercharge and hoop's speed multiplier
+		var hypercharge_multiplier = 1 + hypercharge / CHARGE_TIME * FULL_CHARGE
+		var effective_speed = (1.0 / (REV_TIME / 1000.0)) * hypercharge_multiplier * hula_hoop.get_speed_multiplier()
+		# This is for display/effect purposes only since we control the phase directly
 	
 	
 	# Handle jump.
@@ -117,7 +119,16 @@ func _ready() -> void:
 	print("Hitbox size is ", get_hitbox_dimensions())
 	
 	# Create a hula hoop using the factory
-	hula_hoop = HulaHoopFactory.create_basic_hoop(skeleton)
+	hula_hoop = HulaHoopFactory.create_hoop(skeleton, {
+		"path_width": 18.0,
+		"path_height": 1.8, 
+		"hoop_width": 900.0, 
+		"hoop_height": 90.0, 
+		"speed_multiplier": 1.0,
+		"tilt_angle": 0.0,
+		"color_front": Color.MAGENTA,
+		"color_back": Color.PURPLE
+	})
 	add_child(hula_hoop)
 	pass # Replace with function body.
 

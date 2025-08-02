@@ -4,11 +4,18 @@ class_name HulaHoop
 const HulaHoopResource = preload("res://scripts/systems/hula_hoop.gd")
 
 # Core properties
-@export var radius: float = 80.0
-@export var speed: float = 1.0  # Revolutions per second
+@export_group("Hoop Size")
+@export var hoop_width: float = 20.0  # Width of the hoop itself
+@export var hoop_height: float = 12.0  # Height of the hoop itself (for ellipse)
+
+@export_group("Path Dimensions")
+@export var path_width: float = 80.0  # Width of the elliptical path
+@export var path_height: float = 48.0  # Height of the elliptical path
+
+@export_group("Motion")
+@export var speed_multiplier: float = 1.0  # Multiplier for base rotation speed
 @export var target_bone_path: String = "CenterBone/LowerSpine"
 @export var tilt_angle: float = 0.0  # Degrees, -45 to 45
-@export var ellipse_ratio: float = 0.6  # Width/height ratio for perspective
 
 # Visual properties
 @export var color_front: Color = Color(1, 0.109804, 0.0588235, 1)  # Bright red
@@ -20,8 +27,6 @@ var skeleton_ref: Skeleton2D
 var target_bone: Bone2D
 var hoop_system: HulaHoopSystem
 var visual_node: Node2D
-var path_2d: Path2D
-var path_follow: PathFollow2D
 var front_line: Line2D
 var back_line: Line2D
 
@@ -43,29 +48,13 @@ func setup_visual_components():
 	visual_node.name = "Visual"
 	add_child(visual_node)
 	
-	# Create Path2D with elliptical curve
-	path_2d = Path2D.new()
-	path_2d.name = "Path2D"
-	visual_node.add_child(path_2d)
-	
-	# Create PathFollow2D
-	path_follow = PathFollow2D.new()
-	path_follow.name = "PathFollow2D"
-	path_follow.rotates = false
-	path_2d.add_child(path_follow)
-	
-	# Create hoop mesh container
-	var hoop_mesh = Node2D.new()
-	hoop_mesh.name = "HoopMesh"
-	path_follow.add_child(hoop_mesh)
-	
 	# Create back half line
 	back_line = Line2D.new()
 	back_line.name = "BackHalf"
 	back_line.z_index = -2
 	back_line.width = line_width
 	back_line.default_color = color_back
-	hoop_mesh.add_child(back_line)
+	visual_node.add_child(back_line)
 	
 	# Create front half line
 	front_line = Line2D.new()
@@ -73,7 +62,7 @@ func setup_visual_components():
 	front_line.z_index = 4
 	front_line.width = line_width
 	front_line.default_color = color_front
-	hoop_mesh.add_child(front_line)
+	visual_node.add_child(front_line)
 	
 	# Update the visual
 	update_hoop_visual()
@@ -86,9 +75,8 @@ func setup_hoop_system():
 	
 	# Create HulaHoop resource
 	var hoop_resource = HulaHoopResource.new()
-	hoop_resource.radius = radius
-	hoop_resource.speed = speed * TAU  # Convert to radians/second
-	hoop_resource.ellipse_ratio = ellipse_ratio
+	hoop_resource.radius = path_width / 2.0  # Convert diameter to radius
+	hoop_resource.ellipse_ratio = path_height / path_width  # Calculate ratio
 	
 	hoop_system.hoop = hoop_resource
 	hoop_system.target_bone_path = target_bone_path
@@ -187,44 +175,6 @@ func count_bone_steps(ancestor: Node, descendant: Node) -> int:
 	return steps
 
 func update_hoop_visual():
-	if not path_2d:
-		return
-	
-	# Create elliptical curve with tilt
-	var curve = Curve2D.new()
-	var points = []
-	var segments = 4  # For smooth ellipse with bezier handles
-	
-	for i in range(segments):
-		var angle = (i / float(segments)) * TAU
-		var x = cos(angle) * radius
-		var y = sin(angle) * radius * ellipse_ratio
-		
-		# Apply tilt rotation
-		var tilted = rotate_point(Vector2(x, y), deg_to_rad(tilt_angle))
-		points.append(tilted)
-	
-	# Add points with bezier handles for smooth curve
-	var handle_length = radius * 0.55  # Magic number for circular bezier
-	
-	# Right
-	curve.add_point(points[0], Vector2(0, -handle_length * ellipse_ratio).rotated(deg_to_rad(tilt_angle)), 
-					Vector2(0, handle_length * ellipse_ratio).rotated(deg_to_rad(tilt_angle)))
-	# Bottom
-	curve.add_point(points[1], Vector2(handle_length, 0).rotated(deg_to_rad(tilt_angle)), 
-					Vector2(-handle_length, 0).rotated(deg_to_rad(tilt_angle)))
-	# Left
-	curve.add_point(points[2], Vector2(0, handle_length * ellipse_ratio).rotated(deg_to_rad(tilt_angle)), 
-					Vector2(0, -handle_length * ellipse_ratio).rotated(deg_to_rad(tilt_angle)))
-	# Top
-	curve.add_point(points[3], Vector2(-handle_length, 0).rotated(deg_to_rad(tilt_angle)), 
-					Vector2(handle_length, 0).rotated(deg_to_rad(tilt_angle)))
-	# Close the loop
-	curve.add_point(points[0], Vector2(0, -handle_length * ellipse_ratio).rotated(deg_to_rad(tilt_angle)), 
-					Vector2(0, 0))
-	
-	path_2d.curve = curve
-	
 	# Update line visuals for the hoop appearance
 	update_hoop_lines()
 
@@ -233,8 +183,8 @@ func update_hoop_lines():
 		return
 	
 	# Create points for front and back halves
-	var half_width = radius * 0.5
-	var half_height = radius * ellipse_ratio * 0.2
+	var half_width = hoop_width / 2.0
+	var half_height = hoop_height / 2.0
 	
 	# Front half (bottom arc)
 	var front_points = []
@@ -265,36 +215,41 @@ func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
 
 func _process(delta: float):
+	# Phase is controlled by character script
 	if not skeleton_ref or not target_bone:
 		return
-	
-	# Update phase
-	current_phase += speed * TAU * delta
-	current_phase = fmod(current_phase, TAU)
 	
 	# Update hoop system phase
 	if hoop_system and hoop_system.hoop:
 		hoop_system.hoop.phase = current_phase
 	
-	# Update visual position
-	if path_follow:
-		path_follow.progress_ratio = current_phase / TAU
-	
-	# Position hoop at target bone
+	# Position hoop at target bone with circular motion
 	if target_bone:
-		global_position = target_bone.global_position
+		var x_offset = cos(current_phase) * (path_width / 2.0)
+		var y_offset = sin(current_phase) * (path_height / 2.0)
+		# Apply tilt to the offset
+		var offset = rotate_point(Vector2(x_offset, y_offset), deg_to_rad(tilt_angle))
+		global_position = target_bone.global_position + offset
 
 # Public API methods
-func set_radius(new_radius: float):
-	radius = new_radius
+func set_path_dimensions(width: float, height: float):
+	path_width = width
+	path_height = height
 	if hoop_system and hoop_system.hoop:
-		hoop_system.hoop.radius = radius
+		hoop_system.hoop.radius = path_width / 2.0
+		hoop_system.hoop.ellipse_ratio = path_height / path_width
 	update_hoop_visual()
 
-func set_speed(new_speed: float):
-	speed = new_speed
-	if hoop_system and hoop_system.hoop:
-		hoop_system.hoop.speed = speed * TAU
+func set_hoop_dimensions(width: float, height: float):
+	hoop_width = width
+	hoop_height = height
+	update_hoop_visual()
+
+func set_speed_multiplier(multiplier: float):
+	speed_multiplier = multiplier
+
+func get_speed_multiplier() -> float:
+	return speed_multiplier
 
 func set_target_bone(bone_path: String):
 	target_bone_path = bone_path
