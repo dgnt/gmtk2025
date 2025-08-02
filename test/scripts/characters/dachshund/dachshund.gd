@@ -8,11 +8,11 @@ const HulaHoop = preload("res://scripts/objects/hula_hoop.gd")
 
 # Physics and control values
 @export var speed = 300.0
-@export var jump_velocity = -600.0
+@export var jump_velocity = -900.0
 const REV_TIME = 800  # ms
 const HOOP_SPEED = 300
 const STABILITY = 250
-var rev = 200
+var rev = .25 #[0,1)
 var lookup = false
 var forward = true
 var hypercharge = 0
@@ -151,6 +151,7 @@ func control(delta):
 		ground_control(delta, pressed, direction)
 	else:
 		air_control(delta, pressed, direction)
+	update_hoop()
 	move_and_slide()
 
 func ground_control(delta, pressed, direction):
@@ -166,7 +167,6 @@ func ground_control(delta, pressed, direction):
 		jump(direction)
 		return
 	hoop_revving(delta)
-	update_hoop()
 
 func air_control(delta, pressed, direction):
 	if "B3" in pressed: rubber_snap(direction)
@@ -180,7 +180,7 @@ func air_control(delta, pressed, direction):
 	#print("OMG")
 	air_momentum += get_gravity() * delta
 	velocity = air_momentum
-	velocity.x += (1 if direction.x > 0 else -1) * speed
+	velocity.x += direction.x * speed
 
 func update_hoop():
 	if hoop_instance:
@@ -204,7 +204,7 @@ func rubber_snap(direction):
 	snap_target = position + direction * SNAP_DISTANCE
 	snap_direction = direction
 	hoop_directing(direction)
-	if direction.x >= 0:
+	if direction.x < 0:
 		rev = 0.5
 	else:
 		rev = 0
@@ -262,6 +262,7 @@ func heli_rev(delta):
 func end_heli():
 	if not helicoptering: return
 	helicoptering = false
+	rev = 0.75
 	# Stop helicopter sound
 	if helicopter_sound_id != -1:
 		AudioManager.stop_helicopter_sound(helicopter_sound_id)
@@ -362,8 +363,10 @@ func hoop_revving(delta):
 func jump(direction):
 	velocity.y = jump_velocity
 	if Input.is_action_pressed("move_up"):
-		velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
+		velocity.y -= cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
 	air_momentum = velocity
+	air_momentum = get_hoop_force_vector() + Vector2(0, jump_velocity)
+	velocity = air_momentum
 	jump_processed = false
 	# Play jump sound
 	AudioManager.play_jump_sound()
@@ -383,9 +386,15 @@ func turn(forward=true):
 	self.forward = forward
 	$Body.transform.x.x = 1 if forward else -1
 
+func get_hoop_force_vector():
+	return HOOP_SPEED * get_hoop_force() * get_hoop_direction()
+	
 func get_hoop_force():
 	# returns a force from -1 to 1
-	return 0
+	return cos(rev * 2 * PI)
+
+func get_hoop_direction():
+	return Vector2(1,0).rotated(hoop_instance.visual_node.rotation)
 
 const HEIGHT = 256 #px
 const WIDTH = 64 #px
