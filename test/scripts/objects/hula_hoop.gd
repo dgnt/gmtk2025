@@ -1,7 +1,7 @@
 extends Node2D
 class_name HulaHoop
 
-const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
+# HulaHoopResource is a global class, no need to preload
 
 # Core properties
 @export_group("Hoop Size")
@@ -256,7 +256,7 @@ func update_hoop_lines():
 func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
 
-func _process(delta: float):
+func _process(_delta: float):
 	# Phase is controlled by character script
 	if not skeleton_ref or not target_bone:
 		return
