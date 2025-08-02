@@ -393,7 +393,7 @@ func _ready() -> void:
 		
 		#hoop_instance2 = HulaHoopFactory.create_basic_hoop(skeleton)
 		## Customize the hoop for dachshund
-		#hoop_instance.set_colors(Color(1, 0.109804, 0.0588235, 1), Color(0.556863, 0.121569, 0.141176, 1))
+		#hoop_instance.set_colors(Color(1, 1, 0.0588235, 1), Color(0.556863, 1, 0.141176, 1))
 		#hoop_instance.set_target_bone("Body/Skeleton2D/CenterBone/LowerChest")
 		#add_child(hoop_instance2)
 
