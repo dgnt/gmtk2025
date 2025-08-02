@@ -115,8 +115,8 @@ func _process(delta):
 	if not enabled or not target_bone or not hoop:
 		return
 	
-	# Update hoop phase
-	hoop.phase = wrapf(hoop.phase + hoop.speed * delta, 0, TAU)
+	# Phase is now controlled by the character script
+	# hoop.phase = wrapf(hoop.phase + hoop.speed * delta, 0, TAU)
 	
 	# Calculate base deformation
 	var x_offset = cos(hoop.phase) * hoop.radius * hoop.intensity

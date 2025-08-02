@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://b4nwmwnep3xc0"]
+[gd_scene load_steps=19 format=3 uid="uid://b4nwmwnep3xc0"]
 
 [ext_resource type="Script" path="res://scripts/characters/generated_dachshund.gd" id="1_bsuya"]
 [ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="2_pd77d"]
@@ -16,68 +16,6 @@
 [ext_resource type="Script" path="res://scripts/systems/hula_hoop_system.gd" id="14_hula_system"]
 [ext_resource type="Script" path="res://scripts/characters/dachshund/camera.gd" id="15_borkh"]
 
-[sub_resource type="Animation" id="Animation_rsn7f"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Body/Skeleton2D/CenterBone/LowerSpine:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-3, 131)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Body/Skeleton2D/CenterBone/LowerSpine:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.0]
-}
-
-[sub_resource type="Animation" id="Animation_lpeds"]
-resource_name = "idle"
-length = 3.0
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Body/Skeleton2D/CenterBone/LowerSpine:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5, 3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(-30, 131), Vector2(30, 131), Vector2(-3, 131)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Body/Skeleton2D/CenterBone/LowerSpine:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.5, 3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [0.0, 0.0, 0.0]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_iletf"]
-_data = {
-"RESET": SubResource("Animation_rsn7f"),
-"idle": SubResource("Animation_lpeds")
-}
-
 [sub_resource type="Curve2D" id="Curve2D_5bv03"]
 _data = {
 "points": PackedVector2Array(0, 0, 0, 0, -70, 0, 0, 0, 0, 0, -26, 12, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 55, 8, 0, 0, 0, 0, 83, -1, 0, 0, 0, 0, 50, -15, 0, 0, 0, 0, 21, -17, 0, 0, 0, 0, -13, -21, 0, 0, 0, 0, -48, -15, 0, 0, 0, 0, -70, 0)
@@ -94,11 +32,6 @@ point_count = 4
 
 [node name="GeneratedDachshund" type="CharacterBody2D"]
 script = ExtResource("1_bsuya")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_iletf")
-}
 
 [node name="HulaHoopSystem" type="Node2D" parent="."]
 script = ExtResource("14_hula_system")
@@ -371,7 +304,6 @@ width_curve = SubResource("Curve_rnjlh")
 default_color = Color(0.556863, 0.121569, 0.141176, 1)
 
 [node name="Camera" type="Camera2D" parent="."]
-zoom = Vector2(3, 3)
 position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true

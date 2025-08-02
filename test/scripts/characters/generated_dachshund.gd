@@ -4,8 +4,8 @@ signal level_failed
 @export var speed = 300.0
 @export var jump_velocity = -600.0
 
-@onready var animation_player = $AnimationPlayer
 @onready var skeleton = $Body/Skeleton2D
+@onready var hula_hoop_system = $HulaHoopSystem
 @onready var facing_forward = true
 
 const REV_TIME = 800  # ms
@@ -60,6 +60,14 @@ func _physics_process(delta: float) -> void:
 	var hooper = get_node("Path2D/PathFollow2D")
 	hooper.progress_ratio = rev
 	
+	# Sync HulaHoopSystem with the rev variable
+	if hula_hoop_system and hula_hoop_system.hoop:
+		# Convert rev (0-1) to phase (0-TAU)
+		hula_hoop_system.hoop.phase = rev * TAU
+		# Adjust speed based on hypercharge
+		var speed_multiplier = 1 + hypercharge / CHARGE_TIME * FULL_CHARGE
+		hula_hoop_system.hoop.speed = TAU / (REV_TIME / 1000.0) * speed_multiplier
+	
 	# Handle jump.
 	if "jump" in pressed and is_on_floor():
 		velocity.y = jump_velocity
@@ -101,10 +109,7 @@ func _physics_process(delta: float) -> void:
 
 
 # Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	if animation_player:
-		setup_animations()
-	
+func _ready() -> void:	
 	start_pos = position
 	# make_torso()
 	# make_head()
@@ -217,9 +222,3 @@ func create_polygon_node(node_name: String, points: PackedVector2Array, shape_co
 	
 	# 4. Return the new node instance in case you need a direct reference to it.
 	return new_polygon
-
-	
-func setup_animations():
-	# Find the AnimationPlayer
-	var animation_player = get_node("AnimationPlayer")
-	
