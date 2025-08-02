@@ -105,10 +105,6 @@ func _ready() -> void:
 	if animation_player:
 		setup_animations()
 	
-	# If running scene in isolation, setup test environment
-	if get_tree().current_scene == self:
-		setup_test_environment()
-	
 	start_pos = position
 	# make_torso()
 	# make_head()
@@ -227,55 +223,3 @@ func setup_animations():
 	# Find the AnimationPlayer
 	var animation_player = get_node("AnimationPlayer")
 	
-
-func setup_test_environment():
-	# Get viewport size for debugging
-	var viewport_size = get_viewport().size
-	print("Viewport size: ", viewport_size)
-	
-	# Create a floor
-	var floor = StaticBody2D.new()
-	floor.name = "TestFloor"
-	
-	# Add collision shape
-	var floor_shape = CollisionShape2D.new()
-	var floor_rect = RectangleShape2D.new()
-	floor_rect.size = Vector2(3000, 100)  # Make it thicker and wider
-	floor_shape.shape = floor_rect
-	floor.add_child(floor_shape)
-	
-	# Add visual representation of floor
-	var floor_visual = ColorRect.new()
-	floor_visual.size = Vector2(3000, 100)
-	floor_visual.position = Vector2(-1500, 50)  # Center the visual on the collision
-	floor_visual.color = Color(0.2, 0.5, 0.2)  # Green color for visibility
-	floor.add_child(floor_visual)
-	
-	# Position the floor at bottom of visible area
-	var floor_y = 400  # Fixed position that should be visible
-	floor.position = Vector2(viewport_size.x / 2, floor_y)
-	print("Floor position: ", floor.position)
-	
-	# Add floor to the scene root
-	get_tree().current_scene.add_child(floor)
-	
-	# Center the character above the floor
-	var char_y = floor_y - 300  # Much higher above floor to avoid collision
-	position = Vector2(viewport_size.x / 2, char_y)
-	print("Character position: ", position)
-	print("Floor Y: ", floor_y, " Character Y: ", char_y)
-	
-	## Add camera centered on character
-	#var camera = Camera2D.new()
-	$Camera.enabled = true
-	$Camera.position = Vector2.ZERO  # Local to character
-	$Camera.zoom = Vector2(0.5, 0.5)  # Zoom out to see more
-	#add_child(camera)
-	
-	# Add background for reference
-	var background = ColorRect.new()
-	background.size = Vector2(3000, 2000)
-	background.position = Vector2(-1500, -1000)
-	background.color = Color(0.9, 0.9, 0.95)  # Light blue
-	background.z_index = -10
-	get_tree().current_scene.add_child(background)
