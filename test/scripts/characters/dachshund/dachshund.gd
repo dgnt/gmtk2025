@@ -148,6 +148,10 @@ func rubber_snap(direction):
 func snap_to(delta) -> bool:
 	if snap_target == null or snapping_time <= 0:
 		return false
+	if snap_direction.x < 0:
+		rev = 0.5
+	else:
+		rev = 0
 	snapping_time -= delta
 	if snapping_time > 0.5 * SNAP_TIME:
 		return true
@@ -279,10 +283,20 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 	return true
 
 func walk(direction):
+	if true:
+		walk_jerked(direction)
+		return
 	if direction.x:
 		velocity.x = direction.x * speed
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
+
+func walk_jerked(direction):
+	if direction.x:
+		velocity.x = direction.x * speed + abs(direction.x) * max(speed * 0.9, HOOP_SPEED) * cos(rev * TAU)
+	else:
+		velocity.x = move_toward(velocity.x, 0, speed)
+	
 	
 func direct_player(direction, pressed):
 	if direction.x > 0:
