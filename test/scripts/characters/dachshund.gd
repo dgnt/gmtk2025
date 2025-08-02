@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 signal level_failed
 
+# Physics and control values
 @export var speed = 300.0
 @export var jump_velocity = -600.0
 const REV_TIME = 800  # ms
@@ -9,11 +10,39 @@ const HOOP_SPEED = 300
 const STABILITY = 250
 var rev = 200
 var lookup = false
+var forward = true
 var hypercharge = 0
+var hyperdirection = Vector2(0, -1)
+var air_momentum = Vector2.ZERO
+const MAX_FALL = 500
 const CHARGE_TIME = 2000.0 # ms
 const FULL_CHARGE = 2.0
+const HELI_MAX = 1.5 # s
+var heli_charges = 0
+var heli_time = 0
+const HELI_SPEED = 150
+var air_snaps = 0
+@onready var snap_target = position
+var snap_direction = Vector2(0, -1)
+const SNAP_TIME = .4
+const SNAP_DISTANCE = 100
+var snapping_time = 0
 var locked_skills = []
-const SKILLS = ["jump", "move_left", "move_right", "move_up", "move_down"]
+const SKILLS = ["jump", "move_left", "move_right", "move_up", "move_down", "B0", "B1", "B2", "B3"]
+var jump_processed = true
+var charge_processed = true
+var heli_processed = true
+var helicoptering = false
+const HELI_TRANSPOSE = Vector2(0, -360)
+const HELI_REV_TIME = 0.15 # s
+
+# B0 Ground: Hypercharge
+# B0 Air: Ground-poundish
+# B1 Ground: Jump
+# B1 Air: Helicopter
+# B2: Drop/Use Hooportal
+# B3 Ground: Snap Attack
+# B3 Air: Rubber Snap
 
 func _physics_process(delta: float) -> void:
 	var bod = get_node("Body")
@@ -21,6 +50,24 @@ func _physics_process(delta: float) -> void:
 	for action in SKILLS:
 		if action not in locked_skills and Input.is_action_pressed(action):
 			pressed.append(action)
+	var direction := Input.get_axis("move_left", "move_right")
+	control(delta)
+	
+	for i in range(get_slide_collision_count()):
+		var collider = get_slide_collision(i).get_collider()
+		if collider.name == "Spikes":
+			die()
+	#print(position)
+	return
+	if is_on_floor():
+		control(delta)
+		#move_and_slide()
+		update_hoop()
+		return
+	else:
+		if hyper_airtime(delta): 
+			move_and_slide()
+			return
 		
 	
 	# Add the gravity.
@@ -49,7 +96,6 @@ func _physics_process(delta: float) -> void:
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction := Input.get_axis("move_left", "move_right")
 	var hoop_h = 0
 	if not lookup:
 		hoop_h = -cos(rev*2*PI) * HOOP_SPEED * (1 + hypercharge / CHARGE_TIME * FULL_CHARGE)
@@ -75,9 +121,231 @@ func _physics_process(delta: float) -> void:
 	for i in range(get_slide_collision_count()):
 		var collider = get_slide_collision(i).get_collider()
 		if collider.name == "Spikes":
-			level_failed.emit()
-			set_deferred("monitoring", false) # Disable monitoring after first trigger
-			set_deferred("process_mode", Node.PROCESS_MODE_DISABLED) # Disable script processing
+			print("Should die")
+			die()
+
+func control(delta):
+	var pressed = []
+	var direction: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	for action in SKILLS:
+		if action not in locked_skills and Input.is_action_pressed(action):
+			pressed.append(action)
+	if "B1" not in pressed:
+		jump_processed = true
+	if "B0" not in pressed:
+		charge_processed = true
+	if is_on_floor():
+		ground_control(delta, pressed, direction)
+	else:
+		air_control(delta, pressed, direction)
+	move_and_slide()
+
+func ground_control(delta, pressed, direction):
+	air_momentum = Vector2.ZERO
+	refresh_airskills()
+	direct_player(direction, pressed)
+	hoop_directing(direction)
+	if hypercharging(delta, direction, "B0" in pressed):
+		update_hoop()
+		return
+	walk(direction)
+	if "B1" in pressed:
+		jump(direction)
+		return
+	hoop_revving(delta)
+	update_hoop()
+
+func air_control(delta, pressed, direction):
+	if "B3" in pressed: rubber_snap(direction)
+	#print("snapto")
+	if snap_to(delta): return
+	if "B1" in pressed and jump_processed: helicopter(direction)
+	#print("helifall")
+	if helicopter_fall(delta, pressed, direction): return
+	#print("hyper")
+	if hyper_airtime(delta): return
+	#print("OMG")
+	air_momentum += get_gravity() * delta
+	velocity = air_momentum
+	velocity.x += (1 if direction.x > 0 else -1) * speed
+
+func update_hoop():
+	$Path2D/PathFollow2D.progress_ratio = rev
+
+func hoop_directing(direction):
+	if direction:
+		$Path2D.rotation = direction.angle()
+	else:
+		$Path2D.rotation = (Vector2(1 if forward else -1,0)).angle()
+	if $Path2D.rotation > PI/2:
+		$Path2D.rotation -= PI
+	elif $Path2D.rotation < -PI/2:
+		$Path2D.rotation += PI
+	
+func rubber_snap(direction):
+	if air_snaps <= 0: return
+	air_snaps -= 1
+	snapping_time = SNAP_TIME
+	snap_target = position + direction * SNAP_DISTANCE
+	snap_direction = direction
+	hoop_directing(direction)
+	if direction.x >= 0:
+		rev = 0.5
+	else:
+		rev = 0
+	air_momentum = Vector2.ZERO
+	velocity = air_momentum
+	clear_fall_type("airsnap")
+	update_hoop()
+
+func snap_to(delta) -> bool:
+	if snap_target == null or snapping_time <= 0:
+		return false
+	snapping_time -= delta
+	if snapping_time > 0.5 * SNAP_TIME:
+		return true
+	if snapping_time < 0:
+		snapping_time = 0
+		air_momentum = snap_direction * SNAP_DISTANCE / SNAP_TIME * 2
+		position = snap_target
+		return false
+	var rdelta = min(delta, SNAP_TIME*0.5 - snapping_time)
+	position += snap_direction * SNAP_DISTANCE / (SNAP_TIME / 2) * rdelta
+	velocity = Vector2.ZERO
+	return true
+	
+func hyper_airtime(delta) -> bool: # retval is skip rest of controls
+	if hypercharge > 0:
+		air_momentum += get_gravity() * delta * (1 - hypercharge/CHARGE_TIME)
+		velocity = air_momentum + hyperdirection * (1+hypercharge/CHARGE_TIME*FULL_CHARGE) * HOOP_SPEED
+		hypercharge -= delta * 1000
+		if hypercharge <= 0:
+			hypercharge = 0
+			return false
+		return true
+	return false
+
+func start_heli():
+	if helicoptering: return
+	helicoptering = true
+	$Path2D.rotation = 0
+	$Path2D.position = HELI_TRANSPOSE
+
+func heli_rev(delta):
+	$Path2D/PathFollow2D.progress_ratio += delta / HELI_REV_TIME
+
+func end_heli():
+	if not helicoptering: return
+	helicoptering = false
+	$Path2D.position = Vector2.ZERO
+
+func helicopter(direction):
+	if heli_charges <= 0: return
+	start_heli()
+	heli_charges -= 1
+	heli_time = HELI_MAX
+	air_momentum = Vector2.ZERO
+	clear_fall_type("helicopter")
+	heli_processed = false
+
+func helicopter_fall(delta, pressed, direction) -> bool:
+	if heli_time <= 0:
+		end_heli()
+		heli_processed = true
+		return false
+	if "B1" in pressed and heli_processed:
+		end_heli()
+		heli_time = 0
+		return false
+	if "B1" not in pressed:
+		heli_processed = true
+	heli_time -= delta
+	air_momentum = Vector2.ZERO
+	velocity = Vector2(direction.x * HELI_SPEED, 0)
+	heli_rev(delta)
+	return true
+	#TODO: Play Helicopter animations
+
+func clear_fall_type(except):
+	if except != "helicopter" and heli_time < HELI_MAX:
+		heli_time = 0
+	if except != "airsnap" and snapping_time < SNAP_TIME:
+		snapping_time = 0
+		snap_target = null
+	if except != "hypercharge":
+		hypercharge = 0
+
+func refresh_airskills():
+	air_snaps = 1
+	heli_charges = 1
+	
+func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of control
+	velocity.x = 0
+	if charging:
+		charge_processed = false
+		hypercharge += delta * 1000.0
+		var old_rev = rev
+		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
+		rev -= int(rev)
+		if hypercharge >= CHARGE_TIME:
+			if ($Body.transform.x.x > 0 and old_rev < 0.5 and rev > 0.5):
+				rev = 0.5
+				hyperdirection = direction
+				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
+			elif ($Body.transform.x.x < 0 and rev < old_rev):
+				rev = 0
+				hyperdirection = direction
+				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
+				# TODO: Punish hypercharging into the ground
+		return true
+	else:
+		hypercharge -= delta * 1000.0
+		if hypercharge <= 0:
+			hypercharge = 0
+			return false
+		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
+		rev -= int(rev)
+		return true
+	return true
+
+func walk(direction):
+	if direction.x:
+		velocity.x = direction.x * speed
+	else:
+		velocity.x = move_toward(velocity.x, 0, speed)
+	
+func direct_player(direction, pressed):
+	if direction.x > 0:
+		turn()
+	elif direction.x < 0:
+		turn(false)
+	
+func hoop_revving(delta):
+	rev += delta * 1000.0 / REV_TIME
+	rev -= int(rev)
+
+func jump(direction):
+	velocity.y = jump_velocity
+	if Input.is_action_pressed("move_up"):
+		velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
+	air_momentum = velocity
+	jump_processed = false
+
+func charge_process(delta, pressed):
+	if "B0" in pressed:
+		hypercharge += delta * 1000
+		if hypercharge > CHARGE_TIME:
+			hypercharge = CHARGE_TIME
+	else:
+		hypercharge = 0
+		
+func turn(forward=true):
+	self.forward = forward
+	$Body.transform.x.x = 1 if forward else -1
+
+func get_hoop_force():
+	# returns a force from -1 to 1
+	return 0
 
 const HEIGHT = 256 #px
 const WIDTH = 64 #px
@@ -115,11 +383,10 @@ func sanify_pack(v2a: PackedVector2Array) -> void:
 func _process(delta: float) -> void:
 	pass
 
-func _on_body_entered(body: Node2D):
-	print("Collision!")
-	if body.get_collision_layer_bit(2):
-		position = start_pos
-	pass
+func die() -> void:
+	level_failed.emit()
+	set_deferred("monitoring", false) # Disable monitoring after first trigger
+	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED) # Disable script processing
 	
 func get_hitbox_dimensions():
 	var top = $CollisionPolygon2D.polygon[0].y
