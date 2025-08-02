@@ -8,7 +8,7 @@ signal level_failed
 @onready var hula_hoop_system = $HulaHoopSystem
 @onready var facing_forward = true
 
-const REV_TIME = 800  # ms
+const REV_TIME = 2800  # ms
 const HOOP_SPEED = 300
 const STABILITY = 250
 var rev = 200
