@@ -2,9 +2,7 @@ extends CharacterBody2D
 
 signal level_failed
 
-# Preload the HulaHoopFactory
-const HulaHoopFactory = preload("res://scripts/systems/hula_hoop_factory.gd")
-const HulaHoop = preload("res://scripts/objects/hula_hoop.gd")
+# HulaHoopFactory and HulaHoop are global classes, no need to preload
 
 # Physics and control values
 @export var speed = 300.0

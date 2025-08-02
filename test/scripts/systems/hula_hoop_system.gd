@@ -1,7 +1,7 @@
 extends Node2D
 class_name HulaHoopSystem
 
-const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
+# HulaHoopResource is a global class, no need to preload
 
 @export var hoop: HulaHoopResource
 @export var target_bone_path: String = "CenterBone"
@@ -114,7 +114,7 @@ func reset_bones_to_rest():
 	for bone in all_bones:
 		bone.position = bone.rest.origin
 
-func _process(delta):
+func _process(_delta):
 	if not enabled or not target_bone or not hoop:
 		return
 	
