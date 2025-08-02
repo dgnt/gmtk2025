@@ -367,6 +367,9 @@ func jump(direction):
 	jump_processed = false
 	# Play jump sound
 	AudioManager.play_jump_sound()
+	# Play jump animation
+	if $AnimationPlayer.has_animation("jump"):
+		$AnimationPlayer.play("jump")
 
 func charge_process(delta, pressed):
 	if "B0" in pressed:

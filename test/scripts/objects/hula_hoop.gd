@@ -29,6 +29,8 @@ var hoop_system: HulaHoopSystem
 var visual_node: Node2D
 var front_line: Line2D
 var back_line: Line2D
+var left_distortion: ColorRect
+var right_distortion: ColorRect
 
 # Internal state
 var current_phase: float = 0.0
@@ -48,6 +50,9 @@ func setup_visual_components():
 	visual_node.name = "Visual"
 	add_child(visual_node)
 	
+	# Create distortion effects for left and right edges
+	setup_distortion_effects()
+	
 	# Create back half line
 	back_line = Line2D.new()
 	back_line.name = "BackHalf"
@@ -66,6 +71,30 @@ func setup_visual_components():
 	
 	# Update the visual
 	update_hoop_visual()
+
+func setup_distortion_effects():
+	# Load the air distortion material
+	var distortion_material = load("res://assets/materials/air_distortion_material.tres")
+	
+	# Create left edge distortion
+	left_distortion = ColorRect.new()
+	left_distortion.name = "LeftDistortion"
+	left_distortion.material = distortion_material
+	left_distortion.size = Vector2(200, 200)
+	left_distortion.position = Vector2(-100, -100)
+	left_distortion.z_index = -3
+	left_distortion.color = Color(1, 1, 1, 0)  # Transparent
+	visual_node.add_child(left_distortion)
+	
+	# Create right edge distortion
+	right_distortion = ColorRect.new()
+	right_distortion.name = "RightDistortion"
+	right_distortion.material = distortion_material.duplicate()
+	right_distortion.size = Vector2(200, 200)
+	right_distortion.position = Vector2(-100, -100)
+	right_distortion.z_index = -3
+	right_distortion.color = Color(1, 1, 1, 0)  # Transparent
+	visual_node.add_child(right_distortion)
 
 func setup_hoop_system():
 	# Create HulaHoopSystem node
@@ -214,6 +243,24 @@ func update_hoop_lines():
 	back_line.default_color = color_back
 	front_line.width = line_width
 	back_line.width = line_width
+	
+	# Update distortion effect positions
+	if left_distortion and right_distortion:
+		# Position distortions at the leftmost and rightmost points
+		var left_pos = Vector2(-half_width, 0)
+		var right_pos = Vector2(half_width, 0)
+		
+		left_distortion.position = left_pos - left_distortion.size / 2.0
+		right_distortion.position = right_pos - right_distortion.size / 2.0
+		
+		# Update shader parameters with edge positions
+		if left_distortion.material:
+			left_distortion.material.set_shader_parameter("left_edge_position", visual_node.to_global(left_pos))
+			left_distortion.material.set_shader_parameter("right_edge_position", visual_node.to_global(right_pos))
+		
+		if right_distortion.material:
+			right_distortion.material.set_shader_parameter("left_edge_position", visual_node.to_global(left_pos))
+			right_distortion.material.set_shader_parameter("right_edge_position", visual_node.to_global(right_pos))
 
 func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
@@ -233,6 +280,24 @@ func _process(delta: float):
 		var y_offset = sin(current_phase) * (path_height / 2.0)
 		# No need to rotate offset since visual_node handles rotation
 		global_position = target_bone.global_position + Vector2(x_offset, y_offset)
+		
+		# Update distortion shader edge positions every frame
+		if left_distortion and right_distortion and visual_node:
+			var half_width = hoop_width / 2.0
+			var left_pos = Vector2(-half_width, 0)
+			var right_pos = Vector2(half_width, 0)
+			
+			# Convert to global positions considering rotation
+			var global_left = visual_node.to_global(left_pos)
+			var global_right = visual_node.to_global(right_pos)
+			
+			if left_distortion.material:
+				left_distortion.material.set_shader_parameter("left_edge_position", global_left)
+				left_distortion.material.set_shader_parameter("right_edge_position", global_right)
+			
+			if right_distortion.material:
+				right_distortion.material.set_shader_parameter("left_edge_position", global_left)
+				right_distortion.material.set_shader_parameter("right_edge_position", global_right)
 
 # Public API methods
 func set_path_dimensions(width: float, height: float):
