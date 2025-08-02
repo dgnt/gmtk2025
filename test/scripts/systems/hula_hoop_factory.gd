@@ -4,7 +4,7 @@ class_name HulaHoopFactory
 # Factory method to create hula hoops
 static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHoop:
 	# Load the HulaHoop scene
-	var hoop_scene = preload("res://test/scenes/objects/HulaHoop.tscn")
+	var hoop_scene = preload("res://scenes/objects/HulaHoop.tscn")
 	var hoop_instance = hoop_scene.instantiate() as HulaHoop
 	
 	# Apply parameters

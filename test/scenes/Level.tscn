@@ -152,3 +152,5 @@ tile_map_data = PackedByteArray("AAAAAAQAAgAEAAIAAAAAAAMAAgAEAAIAAAAAAAIAAgAEAAI
 tile_set = SubResource("TileSet_f4pxv")
 
 [node name="GeneratedDachshund" parent="." instance=ExtResource("2_31pra")]
+speed = null
+jump_velocity = null

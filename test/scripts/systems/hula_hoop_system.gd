@@ -1,7 +1,7 @@
 extends Node2D
 class_name HulaHoopSystem
 
-const HulaHoopResource = preload("res://scripts/systems/hula_hoop.gd")
+const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
 
 @export var hoop: HulaHoopResource
 @export var target_bone_path: String = "CenterBone"

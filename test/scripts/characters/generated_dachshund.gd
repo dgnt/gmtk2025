@@ -92,10 +92,17 @@ func control(delta):
 	else:
 		air_control(delta, pressed, direction)
 	move_and_slide()
+	
+	# Update facing direction based on velocity
+	if velocity.x < 0:
+		$Body.transform.x = Vector2(-1, 0)
+	elif velocity.x > 0:
+		$Body.transform.x = Vector2(1, 0)
 
 func ground_control(delta, pressed, direction):
 	air_momentum = Vector2.ZERO
 	refresh_airskills()
+	lookup = "move_up" in pressed
 	direct_player(direction, pressed)
 	hoop_directing(direction)
 	if hypercharging(delta, direction, "B0" in pressed):
@@ -125,22 +132,35 @@ func update_hoop():
 
 func hoop_directing(direction):
 	if hula_hoop:
-		var angle = 0.0
-		if direction:
-			angle = direction.angle()
+		if lookup:
+			hula_hoop.set_tilt_angle($Body.transform.x.x * -45)
 		else:
-			angle = (Vector2(1 if forward else -1,0)).angle()
-		if angle > PI/2:
-			angle -= PI
-		elif angle < -PI/2:
-			angle += PI
-		hula_hoop.set_tilt_angle(angle)
+			hula_hoop.set_tilt_angle(0)
+			var angle = 0.0
+			if direction:
+				angle = direction.angle()
+			else:
+				angle = (Vector2(1 if forward else -1,0)).angle()
+			if angle > PI/2:
+				angle -= PI
+			elif angle < -PI/2:
+				angle += PI
 
 func walk(direction):
+	var hoop_h = 0
+	if not lookup:
+		hoop_h = -cos(rev*2*PI) * HOOP_SPEED * (1 + hypercharge / CHARGE_TIME * FULL_CHARGE)
+		if is_on_floor():
+			if abs(hoop_h) < STABILITY or hypercharge > 0:
+				hoop_h = 0
+			elif hoop_h > 0:
+				hoop_h -= STABILITY
+			else:
+				hoop_h += STABILITY
 	if direction.x:
-		velocity.x = direction.x * speed
+		velocity.x = direction.x * speed + hoop_h
 	else:
-		velocity.x = move_toward(velocity.x, 0, speed)
+		velocity.x = move_toward(velocity.x, hoop_h, speed)
 
 func direct_player(direction, pressed):
 	if direction.x > 0:

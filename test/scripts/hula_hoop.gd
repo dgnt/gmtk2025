@@ -1,7 +1,7 @@
 extends Node2D
 class_name HulaHoop
 
-const HulaHoopResource = preload("res://scripts/systems/hula_hoop.gd")
+const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
 
 # Core properties
 @export_group("Hoop Size")

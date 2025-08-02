@@ -1,7 +1,7 @@
 extends Resource
 class_name HulaHoopResource
 
-@export var position: float = 0.5  # 0.0 = bottom of torso, 1.0 = top
+@export var position: Vector2 = Vector2(0.0, 0.0) # offset from the targetBone
 @export var radius: float = 50.0   # Base radius in pixels
 @export var speed: float = 2.0     # Radians per second
 @export var phase: float = 0.0     # Current rotation angle

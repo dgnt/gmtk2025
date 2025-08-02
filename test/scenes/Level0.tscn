@@ -1,7 +1,7 @@
-[gd_scene load_steps=6 format=4 uid="uid://bqqmxxnfbklnk"]
+[gd_scene load_steps=6 format=4 uid="uid://c6msu474vw6cl"]
 
 [ext_resource type="Texture2D" uid="uid://xe2lai8nlm84" path="res://icon.svg" id="1_siejb"]
-[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/WinZone.tscn" id="2_q1wrv"]
+[ext_resource type="PackedScene" path="res://scenes/WinZone.tscn" id="2_q1wrv"]
 [ext_resource type="PackedScene" uid="uid://b4nwmwnep3xc0" path="res://scenes/characters/GeneratedDachshund.tscn" id="3_q6kiq"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5qjiw"]
