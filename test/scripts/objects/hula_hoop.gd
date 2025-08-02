@@ -45,6 +45,14 @@ var stretch_time: float = 0.0
 var max_stretch: float = 2.0  # Maximum stretch multiplier
 var stretch_animation_speed: float = 8.0  # How fast the stretch animates
 
+# Snap animation state
+var snap_distance: float = 0.0
+var original_radius: float = 0.0
+var original_position: Vector2 = Vector2.ZERO
+var stretch_duration: float = 0.4  # Duration of the stretch animation
+var original_hoop_width: float = 0.0
+var original_hoop_height: float = 0.0
+
 func _ready():
 	# Don't set up components here since we need skeleton reference
 	# Everything will be set up in initialize()
@@ -234,32 +242,14 @@ func update_hoop_lines():
 	# Create points for front and back halves
 	var half_width = hoop_width / 2.0
 	var half_height = hoop_height / 2.0
-	
+		
 	# Front half (bottom arc)
 	var front_points = []
 	for i in range(9):  # More points for smoother deformation
 		var t = i / 8.0
 		var base_x = lerp(-half_width, half_width, t)
 		var base_y = half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		var point = Vector2(base_x, base_y)
-		
-		# Apply asymmetric stretch based on direction
-		if is_stretching:
-			# Calculate how aligned this point is with the stretch direction
-			# 1.0 = perfectly aligned (front), -1.0 = opposite (rear)
-			var point_angle = point.normalized()
-			var alignment = point_angle.dot(stretch_direction.normalized())
-			
-			# Remap alignment from [-1, 1] to [0, 1] where 0 is rear, 1 is front
-			var stretch_amount = (alignment + 1.0) * 0.5
-			
-			# Apply exponential curve for more dramatic front stretch
-			stretch_amount = pow(stretch_amount, 2.0)
-			
-			# Calculate the stretch offset for this point
-			var point_stretch = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * stretch_amount
-			point += point_stretch
-		
+		var point = Vector2(base_x, base_y)	
 		front_points.append(point)
 	
 	# Back half (top arc)
@@ -268,24 +258,7 @@ func update_hoop_lines():
 		var t = i / 8.0
 		var base_x = lerp(-half_width, half_width, t)
 		var base_y = -half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		var point = Vector2(base_x, base_y)
-		
-		# Apply asymmetric stretch based on direction
-		if is_stretching:
-			# Calculate how aligned this point is with the stretch direction
-			var point_angle = point.normalized()
-			var alignment = point_angle.dot(stretch_direction.normalized())
-			
-			# Remap alignment from [-1, 1] to [0, 1] where 0 is rear, 1 is front
-			var stretch_amount = (alignment + 1.0) * 0.5
-			
-			# Apply exponential curve for more dramatic front stretch
-			stretch_amount = pow(stretch_amount, 2.0)
-			
-			# Calculate the stretch offset for this point
-			var point_stretch = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * stretch_amount
-			point += point_stretch
-		
+		var point = Vector2(base_x, base_y)		
 		back_points.append(point)
 	
 	front_line.points = front_points
@@ -334,26 +307,22 @@ func _process(delta: float):
 	# Update hoop system phase
 	if hoop_system and hoop_system.hoop:
 		hoop_system.hoop.phase = current_phase
-	
-	# Update stretch animation
-	if is_stretching:
-		update_stretch_animation(delta)
-	
+		
 	# Position hoop at target bone with circular motion
 	if target_bone:
 		var x_offset = cos(current_phase) * (path_width / 2.0)
 		var y_offset = sin(current_phase) * (path_height / 2.0)
 		var base_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
 		
-		# Offset position during stretch to keep rear edge fixed
+		# Update stretch animation
 		if is_stretching:
-			# The hoop should appear to stretch forward, so we offset it backward
-			# by half the stretch amount to keep the rear edge in place
-			var stretch_offset = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * 0.5
+			var stretch_offset = update_stretch_animation(delta)
 			base_position -= stretch_offset
 		
 		global_position = base_position
-		
+	
+
+
 
 # Public API methods
 func set_path_dimensions(width: float, height: float):
@@ -405,11 +374,22 @@ func set_colors(front: Color, back: Color):
 		back_line.default_color = color_back
 
 # Stretch animation methods
-func start_stretch(direction: Vector2, duration: float = 0.2):
+func start_stretch(direction: Vector2, duration: float = 0.2, distance: float = 0.0):
 	is_stretching = true
 	stretch_direction = -direction.normalized()
 	stretch_time = 0.0
 	stretch_factor = 1.0
+	snap_distance = distance
+	stretch_duration = duration
+	
+	# Store original radius and position
+	if hoop_system and hoop_system.hoop:
+		original_radius = hoop_system.hoop.radius
+		original_position = hoop_system.hoop.position
+	
+	# Store original hoop visual dimensions
+	original_hoop_width = hoop_width
+	original_hoop_height = hoop_height
 	
 	# Don't override the rotation set by hoop_directing
 	# The visual node rotation should be controlled by tilt_angle
@@ -420,14 +400,27 @@ func update_stretch_animation(delta: float):
 	
 	stretch_time += delta
 	
-	# Match the SNAP_TIME phases: 0.2s pause, 0.2s movement
-	# Total duration is 0.4s (SNAP_TIME)
-	var half_time = 0.2  # Half of SNAP_TIME
+	# Match the stretch duration phases: first half pause, second half movement
+	var half_time = stretch_duration / 2.0
 	
 	if stretch_time < half_time:
 		# First phase: stretch out during pause (0 to 0.2s)
 		var progress = stretch_time / half_time
 		stretch_factor = 1.0 + (max_stretch - 1.0) * ease(progress, -2.0)
+		
+		# Lerp radius and position during first phase if snap_distance is set
+		if snap_distance > 0 and hoop_system and hoop_system.hoop:
+			var target_radius = snap_distance / 2.0
+			hoop_system.hoop.radius = lerp(original_radius, target_radius, progress)
+			
+			# Update visual dimensions to match the radius change
+			var target_width = original_hoop_width * stretch_factor
+			var target_height = original_hoop_height * stretch_factor
+			hoop_width = lerp(original_hoop_width, target_width, progress)
+			hoop_height = lerp(original_hoop_height, target_height, progress)
+			
+			# Move the hoop x position by snap_distance/2
+			hoop_system.hoop.position.x = original_position.x + (snap_distance / 2.0) * progress
 	elif stretch_time < half_time * 2:
 		# Second phase: snap back during movement (0.2s to 0.4s)
 		var progress = (stretch_time - half_time) / half_time
@@ -439,6 +432,19 @@ func update_stretch_animation(delta: float):
 			# Settle to normal with bounce
 			var bounce_progress = (progress - 0.5) * 2
 			stretch_factor = 0.7 + 0.3 * ease(bounce_progress, -1.5)
+		
+		# Lerp radius and position back during second phase
+		if snap_distance > 0 and hoop_system and hoop_system.hoop:
+			var target_radius = snap_distance / 2.0
+			hoop_system.hoop.radius = lerp(target_radius, original_radius, progress)
+			
+			# Restore visual dimensions
+			var radius_ratio = target_radius / original_radius
+			hoop_width = lerp(original_hoop_width * radius_ratio, original_hoop_width, progress)
+			hoop_height = lerp(original_hoop_height * radius_ratio, original_hoop_height, progress)
+			
+			# Move the hoop x position back
+			hoop_system.hoop.position.x = original_position.x + (snap_distance / 2.0) * (1.0 - progress)
 	else:
 		# Animation complete
 		end_stretch()
@@ -450,6 +456,18 @@ func end_stretch():
 	is_stretching = false
 	stretch_factor = 1.0
 	stretch_time = 0.0
+	
+	# Restore original radius and position
+	if snap_distance > 0 and hoop_system and hoop_system.hoop:
+		hoop_system.hoop.radius = original_radius
+		hoop_system.hoop.position = original_position
+	
+	# Restore original hoop dimensions
+	hoop_width = original_hoop_width
+	hoop_height = original_hoop_height
+	
+	# Reset snap distance
+	snap_distance = 0.0
 	
 	# Reset distortion strength
 	if left_distortion and left_distortion.material:
