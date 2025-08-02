@@ -130,6 +130,18 @@ func _ready() -> void:
 		"color_back": Color.PURPLE
 	})
 	add_child(hula_hoop)
+	
+	#hula_hoop2 = HulaHoopFactory.create_hoop($Body/Skeleton2D/CenterBone/LowerSpine, {
+		#"path_width": 18.0,
+		#"path_height": 1.8, 
+		#"hoop_width": 900.0, 
+		#"hoop_height": 90.0, 
+		#"speed_multiplier": 1.0,
+		#"tilt_angle": 0.0,
+		#"color_front": Color.RED,
+		#"color_back": Color.DARK_RED
+	#})
+	#add_child(hula_hoop2)
 	pass # Replace with function body.
 
 

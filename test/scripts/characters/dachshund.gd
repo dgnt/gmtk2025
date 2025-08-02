@@ -365,7 +365,7 @@ var start_pos = Vector2(100,100)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	locked_skills = get_parent().get_locked_skills()
+	#locked_skills = get_parent().get_locked_skills()
 	start_pos = position
 	# make_torso()
 	# make_head()

@@ -182,6 +182,10 @@ func update_hoop_lines():
 	if not front_line or not back_line:
 		return
 	
+	# Clear existing points
+	front_line.clear_points()
+	back_line.clear_points()
+	
 	# Create points for front and back halves
 	var half_width = hoop_width / 2.0
 	var half_height = hoop_height / 2.0
@@ -192,7 +196,7 @@ func update_hoop_lines():
 		var t = i / 4.0
 		var x = lerp(-half_width, half_width, t)
 		var y = half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		front_points.append(rotate_point(Vector2(x, y), deg_to_rad(tilt_angle)))
+		front_points.append(Vector2(x, y))
 	
 	# Back half (top arc)
 	var back_points = []
@@ -200,7 +204,7 @@ func update_hoop_lines():
 		var t = i / 4.0
 		var x = lerp(-half_width, half_width, t)
 		var y = -half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		back_points.append(rotate_point(Vector2(x, y), deg_to_rad(tilt_angle)))
+		back_points.append(Vector2(x, y))
 	
 	front_line.points = front_points
 	back_line.points = back_points
@@ -227,9 +231,8 @@ func _process(delta: float):
 	if target_bone:
 		var x_offset = cos(current_phase) * (path_width / 2.0)
 		var y_offset = sin(current_phase) * (path_height / 2.0)
-		# Apply tilt to the offset
-		var offset = rotate_point(Vector2(x_offset, y_offset), deg_to_rad(tilt_angle))
-		global_position = target_bone.global_position + offset
+		# No need to rotate offset since visual_node handles rotation
+		global_position = target_bone.global_position + Vector2(x_offset, y_offset)
 
 # Public API methods
 func set_path_dimensions(width: float, height: float):
@@ -262,6 +265,8 @@ func set_target_bone(bone_path: String):
 
 func set_tilt_angle(angle: float):
 	tilt_angle = clamp(angle, -45.0, 45.0)
+	if visual_node:
+		visual_node.rotation = deg_to_rad(tilt_angle)
 	update_hoop_visual()
 
 func set_colors(front: Color, back: Color):
