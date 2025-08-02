@@ -1,7 +1,5 @@
 [gd_resource type="Theme" load_steps=2 format=3 uid="uid://cx60yvxk3u4v"]
 
-[ext_resource type="FontFile" path="res://Assets/Fonts/Roboto-Regular.ttf" id="1_45d3j"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_123abc"]
 bg_color = Color(0.180392, 0.490196, 0.729412, 1) ; A medium blue
 corner_radius_top_left = 8
@@ -17,7 +15,6 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [resource]
-default_font = ExtResource("1_45d3j")
 default_font_size = 24
 Button/colors/font_color = Color(1, 1, 1, 1) ; White text
 Button/colors/font_hover_color = Color(0.9, 0.9, 0.9, 1) ; Slightly off-white on hover
