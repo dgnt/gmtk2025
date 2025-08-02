@@ -1,7 +1,9 @@
 extends Node2D
 class_name HulaHoopSystem
 
-@export var hoop: HulaHoop
+const HulaHoopResource = preload("res://scripts/systems/hula_hoop.gd")
+
+@export var hoop: HulaHoopResource
 @export var target_bone_path: String = "CenterBone"
 @export var enabled: bool = true
 @export var decay_rate: float = 0.8  # How much influence decays per bone distance
@@ -13,10 +15,13 @@ var bone_data: Dictionary = {}  # Bone2D -> {rest_position, distance, affected}
 var all_bones: Array = []
 
 func _ready():
-	# Find the skeleton in the parent
-	skeleton = get_node("../Body/Skeleton2D") as Skeleton2D
+	# Skeleton should be set via initialize() method
+	pass
+
+func initialize(skeleton_ref: Skeleton2D):
+	skeleton = skeleton_ref
 	if not skeleton:
-		push_error("HulaHoopSystem: Could not find Skeleton2D in parent")
+		push_error("HulaHoopSystem: No skeleton provided")
 		return
 	
 	# Find the target bone
@@ -28,14 +33,6 @@ func _ready():
 		
 		# Cache all bones and calculate distances
 		cache_bone_data()
-	
-	# Create default hoop if none provided
-	if not hoop:
-		hoop = HulaHoop.new()
-		hoop.position = 0.5
-		hoop.radius = 30.0
-		hoop.speed = 3.0
-		hoop.ellipse_ratio = 0.6
 
 func cache_bone_data():
 	# Clear existing data
@@ -119,8 +116,8 @@ func _process(delta):
 	# hoop.phase = wrapf(hoop.phase + hoop.speed * delta, 0, TAU)
 	
 	# Calculate base deformation
-	var x_offset = cos(hoop.phase) * hoop.radius * hoop.intensity
-	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio * hoop.intensity
+	var x_offset = cos(hoop.phase) * hoop.radius
+	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio
 	var base_deformation = Vector2(x_offset, y_offset)
 	
 	# Process bones from root to leaves to handle inheritance properly
