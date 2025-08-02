@@ -42,7 +42,6 @@ var is_stretching: bool = false
 var stretch_factor: float = 1.0  # 1.0 = normal, >1.0 = stretched
 var stretch_direction: Vector2 = Vector2.RIGHT
 var stretch_time: float = 0.0
-var max_stretch: float = 2.0  # Maximum stretch multiplier
 var stretch_animation_speed: float = 8.0  # How fast the stretch animates
 
 # Snap animation state
@@ -382,10 +381,9 @@ func start_stretch(direction: Vector2, duration: float = 0.2, distance: float = 
 	snap_distance = distance
 	stretch_duration = duration
 	
-	# Store original radius and position
+	# Store original radius
 	if hoop_system and hoop_system.hoop:
 		original_radius = hoop_system.hoop.radius
-		original_position = hoop_system.hoop.position
 	
 	# Store original hoop visual dimensions
 	original_hoop_width = hoop_width
@@ -394,40 +392,43 @@ func start_stretch(direction: Vector2, duration: float = 0.2, distance: float = 
 	# Don't override the rotation set by hoop_directing
 	# The visual node rotation should be controlled by tilt_angle
 
-func update_stretch_animation(delta: float):
+func update_stretch_animation(delta: float) -> Vector2:
 	if not is_stretching:
-		return
+		return Vector2.ZERO
 	
 	stretch_time += delta
 	
 	# Match the stretch duration phases: first half pause, second half movement
 	var half_time = stretch_duration / 2.0
+	var position_offset = Vector2.ZERO
+
+	var target_width = original_hoop_width + snap_distance
+	var target_height = original_hoop_height * (target_width / original_hoop_width)
 	
 	if stretch_time < half_time:
 		# First phase: stretch out during pause (0 to 0.2s)
 		var progress = stretch_time / half_time
-		stretch_factor = 1.0 + (max_stretch - 1.0) * ease(progress, -2.0)
+		# Calculate max stretch based on snap distance
+		var calculated_max_stretch = 1.0 + (snap_distance / original_hoop_width) if original_hoop_width > 0 else 2.0
+		stretch_factor = 1.0 + (calculated_max_stretch - 1.0) * ease(progress, -2.0)
 		
 		# Lerp radius and position during first phase if snap_distance is set
-		if snap_distance > 0 and hoop_system and hoop_system.hoop:
-			var target_radius = snap_distance / 2.0
-			hoop_system.hoop.radius = lerp(original_radius, target_radius, progress)
-			
-			# Update visual dimensions to match the radius change
-			var target_width = original_hoop_width * stretch_factor
-			var target_height = original_hoop_height * stretch_factor
+		if snap_distance > 0 and hoop_system and hoop_system.hoop:	
 			hoop_width = lerp(original_hoop_width, target_width, progress)
 			hoop_height = lerp(original_hoop_height, target_height, progress)
 			
-			# Move the hoop x position by snap_distance/2
-			hoop_system.hoop.position.x = original_position.x + (snap_distance / 2.0) * progress
+			# Calculate the position offset (negative because we subtract in _process)
+			position_offset.x = -(snap_distance / 2.0) * progress
 	elif stretch_time < half_time * 2:
 		# Second phase: snap back during movement (0.2s to 0.4s)
 		var progress = (stretch_time - half_time) / half_time
+		# Calculate max stretch based on snap distance
+		var calculated_max_stretch = 1.0 + (snap_distance / original_hoop_width) if original_hoop_width > 0 else 2.0
+		
 		# Quick snap back with overshoot
 		if progress < 0.5:
 			# Snap back quickly
-			stretch_factor = max_stretch - (max_stretch - 0.7) * ease(progress * 2, 2.0)
+			stretch_factor = calculated_max_stretch - (calculated_max_stretch - 0.7) * ease(progress * 2, 2.0)
 		else:
 			# Settle to normal with bounce
 			var bounce_progress = (progress - 0.5) * 2
@@ -435,32 +436,30 @@ func update_stretch_animation(delta: float):
 		
 		# Lerp radius and position back during second phase
 		if snap_distance > 0 and hoop_system and hoop_system.hoop:
-			var target_radius = snap_distance / 2.0
-			hoop_system.hoop.radius = lerp(target_radius, original_radius, progress)
-			
 			# Restore visual dimensions
-			var radius_ratio = target_radius / original_radius
-			hoop_width = lerp(original_hoop_width * radius_ratio, original_hoop_width, progress)
-			hoop_height = lerp(original_hoop_height * radius_ratio, original_hoop_height, progress)
+			hoop_width = lerp(target_width, original_hoop_width, progress)
+			hoop_height = lerp(target_height, original_hoop_height, progress)
 			
-			# Move the hoop x position back
-			hoop_system.hoop.position.x = original_position.x + (snap_distance / 2.0) * (1.0 - progress)
+			# Calculate the position offset back
+			position_offset.x = -(snap_distance / 2.0) * (1.0 - progress)
 	else:
 		# Animation complete
 		end_stretch()
 	
 	# Update visual
 	update_hoop_visual()
+	
+	# Return the calculated offset
+	return position_offset
 
 func end_stretch():
 	is_stretching = false
 	stretch_factor = 1.0
 	stretch_time = 0.0
 	
-	# Restore original radius and position
+	# Restore original radius
 	if snap_distance > 0 and hoop_system and hoop_system.hoop:
 		hoop_system.hoop.radius = original_radius
-		hoop_system.hoop.position = original_position
 	
 	# Restore original hoop dimensions
 	hoop_width = original_hoop_width
