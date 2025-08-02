@@ -145,6 +145,11 @@ func rubber_snap(direction):
 	velocity = air_momentum
 	clear_fall_type("airsnap")
 	update_hoop()
+	
+	# Start hoop stretch animation
+	if hoop_instance and hoop_instance.has_method("start_stretch"):
+		hoop_instance.start_stretch(direction, SNAP_TIME)
+	
 	# Play airburst sound effect
 	AudioManager.play_airburst_sound()
 
