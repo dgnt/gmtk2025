@@ -40,11 +40,11 @@ func load_level(index: int):
 		current_level_index = index
 		var path = level_paths[index]
 		print("GameFlow: Loading level: ", path)
-		get_tree().change_scene_to_file(path)
+		get_tree().call_deferred("change_scene_to_file", path)
 	else:
 		print("GameFlow: No more levels or invalid level index: ", index)
 		# Handle game finished / back to main menu / credits here
-		get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn") # Example: Go back to main menu
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/ui/MainMenu.tscn") # Example: Go back to main menu
 
 # This method will be called by each level when it's ready and has found its WinZone
 func register_level_completion(win_zone_node):
@@ -74,7 +74,7 @@ func _on_level_failed():
 	
 func load_game_complete_scene():
 	print("GameFlow: Loading game completion scene...")
-	get_tree().change_scene_to_file(GAME_COMPLETE_SCENE_PATH)
+	get_tree().call_deferred("change_scene_to_file", GAME_COMPLETE_SCENE_PATH)
 
 # Optional: Method to start the game from level 1 (called from main menu)
 func start_new_game():

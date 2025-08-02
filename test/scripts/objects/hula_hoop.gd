@@ -252,15 +252,6 @@ func update_hoop_lines():
 		
 		left_distortion.position = left_pos - left_distortion.size / 2.0
 		right_distortion.position = right_pos - right_distortion.size / 2.0
-		
-		# Update shader parameters with edge positions
-		if left_distortion.material:
-			left_distortion.material.set_shader_parameter("left_edge_position", visual_node.to_global(left_pos))
-			left_distortion.material.set_shader_parameter("right_edge_position", visual_node.to_global(right_pos))
-		
-		if right_distortion.material:
-			right_distortion.material.set_shader_parameter("left_edge_position", visual_node.to_global(left_pos))
-			right_distortion.material.set_shader_parameter("right_edge_position", visual_node.to_global(right_pos))
 
 func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
@@ -281,23 +272,6 @@ func _process(delta: float):
 		# No need to rotate offset since visual_node handles rotation
 		global_position = target_bone.global_position + Vector2(x_offset, y_offset)
 		
-		# Update distortion shader edge positions every frame
-		if left_distortion and right_distortion and visual_node:
-			var half_width = hoop_width / 2.0
-			var left_pos = Vector2(-half_width, 0)
-			var right_pos = Vector2(half_width, 0)
-			
-			# Convert to global positions considering rotation
-			var global_left = visual_node.to_global(left_pos)
-			var global_right = visual_node.to_global(right_pos)
-			
-			if left_distortion.material:
-				left_distortion.material.set_shader_parameter("left_edge_position", global_left)
-				left_distortion.material.set_shader_parameter("right_edge_position", global_right)
-			
-			if right_distortion.material:
-				right_distortion.material.set_shader_parameter("left_edge_position", global_left)
-				right_distortion.material.set_shader_parameter("right_edge_position", global_right)
 
 # Public API methods
 func set_path_dimensions(width: float, height: float):
