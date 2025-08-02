@@ -23,13 +23,15 @@ func calc_camera_bounds():
 		return
 	var map_limits = tilemap.get_used_rect()
 	var map_cellsize = tilemap.tile_set.tile_size
-	limit_left = map_limits.position.x * map_cellsize.x
-	limit_right = map_limits.end.x * map_cellsize.x
-	limit_top = map_limits.position.y * map_cellsize.y
-	limit_bottom = map_limits.end.y * map_cellsize.y
+	limit_left = 0
+	limit_right = 1920
+	limit_top = 0
+	limit_bottom = 1080
 	
 	for layer in tilemap.get_children():
 		if layer is not TileMapLayer:
+			continue
+		if layer.name != "Ground":
 			continue
 		map_limits = layer.get_used_rect()
 		map_cellsize = layer.tile_set.tile_size
