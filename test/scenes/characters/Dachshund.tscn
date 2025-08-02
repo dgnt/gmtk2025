@@ -348,7 +348,7 @@ position = Vector2(67.5335, -18.4182)
 rotation = -0.266252
 
 [node name="Line2D" type="Line2D" parent="Path2D/PathFollow2D/Hoop"]
-z_index = 2
+z_index = 5
 position = Vector2(-403, -110)
 scale = Vector2(1.00526, 1.02941)
 points = PackedVector2Array(319, 109, 345, 115, 402, 123, 460, 115, 489, 109)
