@@ -38,6 +38,11 @@ position = Vector2(124, -374.5)
 texture = ExtResource("3_6euej")
 offset = Vector2(-129.5, 341.5)
 
+[node name="Head" type="Sprite2D" parent="Sprites"]
+position = Vector2(122, -367)
+texture = ExtResource("10_1xkju")
+offset = Vector2(-127.5, 334)
+
 [node name="Legback" type="Sprite2D" parent="Sprites"]
 position = Vector2(-76, 325)
 texture = ExtResource("4_jgwvi")
@@ -67,11 +72,6 @@ offset = Vector2(-115, 138)
 position = Vector2(8.5, -5.5)
 texture = ExtResource("9_q88xu")
 offset = Vector2(-14, -27.5)
-
-[node name="Head" type="Sprite2D" parent="Sprites"]
-position = Vector2(122, -367)
-texture = ExtResource("10_1xkju")
-offset = Vector2(-127.5, 334)
 
 [node name="Earfront" type="Sprite2D" parent="Sprites"]
 position = Vector2(-12, -363.5)

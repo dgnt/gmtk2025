@@ -42,6 +42,7 @@ const HELI_REV_TIME = 0.15 # s
 
 # Hoop instance
 var hoop_instance: HulaHoop = null
+var hoop_instance2: HulaHoop = null
 const DEFAULT_HOOP_TARGET = "CenterBone/LowerSpine"
 const HELICOPTER_HOOP_TARGET = "CenterBone/LowerChest/Chest/Neck/Head"
 
@@ -403,6 +404,12 @@ func _ready() -> void:
 		hoop_instance.set_colors(Color(1, 0.109804, 0.0588235, 1), Color(0.556863, 0.121569, 0.141176, 1))
 		hoop_instance.set_target_bone(DEFAULT_HOOP_TARGET)
 		add_child(hoop_instance)
+		
+		hoop_instance2 = HulaHoopFactory.create_basic_hoop(skeleton)
+		# Customize the hoop for dachshund
+		hoop_instance.set_colors(Color(1, 0.109804, 0.0588235, 1), Color(0.556863, 0.121569, 0.141176, 1))
+		hoop_instance.set_target_bone("Body/Skeleton2D/CenterBone/LowerChest")
+		add_child(hoop_instance2)
 
 func sane_coord(point: Vector2) -> Vector2:
 	return Vector2(point.x, HEIGHT - point.y)
