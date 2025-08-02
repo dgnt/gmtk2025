@@ -1,0 +1,144 @@
+[gd_scene load_steps=13 format=3 uid="uid://by8emlu68l1l2"]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_3x3kq"]
+[ext_resource type="Texture2D" uid="uid://cx4ph4vbynfid" path="res://assets/sprites/dachshund/tail.png" id="2_34jcw"]
+[ext_resource type="Texture2D" uid="uid://rnusgv62sk8l" path="res://assets/images/hoopdog-scribble-01.png" id="2_e1r35"]
+[ext_resource type="Texture2D" uid="uid://diber08abwbkg" path="res://assets/sprites/dachshund/back-ear.png" id="3_6euej"]
+[ext_resource type="Texture2D" uid="uid://dhy6nd502itxo" path="res://assets/sprites/dachshund/leg-back.png" id="4_jgwvi"]
+[ext_resource type="Texture2D" uid="uid://beqqonveuxptm" path="res://assets/sprites/dachshund/leg-front.png" id="5_l5cay"]
+[ext_resource type="Texture2D" uid="uid://b43os3qi3e1ii" path="res://assets/sprites/dachshund/body.png" id="6_civ0m"]
+[ext_resource type="Texture2D" uid="uid://s2cxfohcu4t8" path="res://assets/sprites/dachshund/arm-back.png" id="7_5vdi7"]
+[ext_resource type="Texture2D" uid="uid://cfjtmrh14as8k" path="res://assets/sprites/dachshund/arm-front.png" id="8_v2nqj"]
+[ext_resource type="Texture2D" uid="uid://db7y5h4hfg2a2" path="res://assets/sprites/dachshund/body-light.png" id="9_q88xu"]
+[ext_resource type="Texture2D" uid="uid://ymp0jdy8fjd2" path="res://assets/sprites/dachshund/dachshund_combined.png" id="10_1xkju"]
+[ext_resource type="Texture2D" uid="uid://bxjpwc1kxrbsd" path="res://assets/sprites/dachshund/ear-front.png" id="11_q5mbb"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_3x3kq")
+
+[node name="Sprites" type="Node2D" parent="."]
+position = Vector2(959, 454)
+scale = Vector2(0.769231, 0.769231)
+
+[node name="Tail" type="Sprite2D" parent="Sprites"]
+position = Vector2(-207.5, 246)
+texture = ExtResource("2_34jcw")
+offset = Vector2(202, -279)
+
+[node name="Backear" type="Sprite2D" parent="Sprites"]
+position = Vector2(124, -374.5)
+texture = ExtResource("3_6euej")
+offset = Vector2(-129.5, 341.5)
+
+[node name="Head" type="Sprite2D" parent="Sprites"]
+position = Vector2(122, -367)
+texture = ExtResource("10_1xkju")
+offset = Vector2(-127.5, 334)
+
+[node name="Legback" type="Sprite2D" parent="Sprites"]
+position = Vector2(-76, 325)
+texture = ExtResource("4_jgwvi")
+offset = Vector2(70.5, -358)
+
+[node name="Legfront" type="Sprite2D" parent="Sprites"]
+position = Vector2(70.5, 316.5)
+texture = ExtResource("5_l5cay")
+offset = Vector2(-76, -349.5)
+
+[node name="Body" type="Sprite2D" parent="Sprites"]
+texture = ExtResource("6_civ0m")
+offset = Vector2(-5.5, -33)
+
+[node name="Armback" type="Sprite2D" parent="Sprites"]
+z_index = 1
+position = Vector2(1, -169)
+texture = ExtResource("7_5vdi7")
+offset = Vector2(-6.5, 136)
+
+[node name="Armfront" type="Sprite2D" parent="Sprites"]
+position = Vector2(109.5, -171)
+texture = ExtResource("8_v2nqj")
+offset = Vector2(-115, 138)
+
+[node name="Bodylight" type="Sprite2D" parent="Sprites"]
+position = Vector2(8.5, -5.5)
+texture = ExtResource("9_q88xu")
+offset = Vector2(-14, -27.5)
+
+[node name="Earfront" type="Sprite2D" parent="Sprites"]
+position = Vector2(-12, -363.5)
+texture = ExtResource("11_q5mbb")
+offset = Vector2(6.5, 330.5)
+
+[node name="Logo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -577.0
+offset_top = 63.0
+offset_right = 623.0
+offset_bottom = 663.0
+grow_horizontal = 2
+texture = ExtResource("2_e1r35")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+
+[node name="PlayBone" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(959, 502)
+rest = Transform2D(1, 0, 0, 1, 959, 502)
+
+[node name="SettingsBone" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(959, 542)
+rest = Transform2D(1, 0, 0, 1, 959, 542)
+
+[node name="DebugBone" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(960, 579)
+rest = Transform2D(1, 0, 0, 1, 960, 579)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.14902, 0.14902, 0.14902, 0)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -50.5
+offset_right = 35.0
+offset_bottom = 50.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Play"
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Settings"
+
+[node name="DebugButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Debug"
+
+[connection signal="pressed" from="VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/DebugButton" to="." method="_on_debug_button_pressed"]

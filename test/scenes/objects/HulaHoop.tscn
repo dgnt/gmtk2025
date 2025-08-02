@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bv2n5xt6oniiy"]
 
-[ext_resource type="Script" path="res://scripts/hula_hoop.gd" id="1_hula"]
+[ext_resource type="Script" path="res://scripts/objects/hula_hoop.gd" id="1_hula"]
 
 [node name="HulaHoop" type="Node2D"]
 script = ExtResource("1_hula")

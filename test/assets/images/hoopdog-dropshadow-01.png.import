@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0puoe65jhsbj"
-path="res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"
+uid="uid://dknus4txa7q8r"
+path="res://.godot/imported/hoopdog-dropshadow-01.png-83e7639e4734a40d6918bc579efb6118.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/hoopdog.png"
-dest_files=["res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"]
+source_file="res://assets/images/hoopdog-dropshadow-01.png"
+dest_files=["res://.godot/imported/hoopdog-dropshadow-01.png-83e7639e4734a40d6918bc579efb6118.ctex"]
 
 [params]
 

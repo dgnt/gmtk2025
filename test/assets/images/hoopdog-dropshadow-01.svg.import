@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0puoe65jhsbj"
-path="res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"
+uid="uid://k7v8a5etik6"
+path="res://.godot/imported/hoopdog-dropshadow-01.svg-74abcb797810c98581be795a89e29cd5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/hoopdog.png"
-dest_files=["res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"]
+source_file="res://assets/images/hoopdog-dropshadow-01.svg"
+dest_files=["res://.godot/imported/hoopdog-dropshadow-01.svg-74abcb797810c98581be795a89e29cd5.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

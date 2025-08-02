@@ -4,7 +4,7 @@ class_name HulaHoopFactory
 # Factory method to create hula hoops
 static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHoop:
 	# Load the HulaHoop scene
-	var hoop_scene = preload("res://test/scenes/objects/HulaHoop.tscn")
+	var hoop_scene = preload("res://scenes/objects/HulaHoop.tscn")
 	var hoop_instance = hoop_scene.instantiate() as HulaHoop
 	
 	# Apply parameters
@@ -49,13 +49,14 @@ static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHo
 # Preset factory methods for common hoop types
 static func create_basic_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"path_width": 80.0,
-		"path_height": 48.0,
-		"hoop_width": 20.0,
-		"hoop_height": 12.0,
+		"path_width": 60.0,
+		"path_height": 6.0,
+		"hoop_width": 600.0,
+		"hoop_height": 60.0,
 		"speed_multiplier": 1.0,
 		"color_front": Color.RED,
-		"color_back": Color.DARK_RED
+		"color_back": Color.DARK_RED,
+		"target_bone_path": ""  # No target bone for menu
 	})
 
 static func create_large_hoop(skeleton: Skeleton2D) -> HulaHoop:

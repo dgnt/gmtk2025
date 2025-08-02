@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <!-- Generator: Adobe Illustrator 29.0.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 192)  -->
+  <defs>
+    <style>
+      .st0 {
+        stroke: #ee2d30;
+      }
+
+      .st0, .st1, .st2, .st3, .st4, .st5, .st6 {
+        fill: none;
+        stroke-width: 21px;
+      }
+
+      .st1 {
+        stroke: #06a64f;
+      }
+
+      .st2 {
+        stroke: #2d77bc;
+      }
+
+      .st7 {
+        filter: url(#drop-shadow-1);
+      }
+
+      .st3 {
+        stroke: #ce652c;
+      }
+
+      .st4 {
+        stroke: #fcb01a;
+      }
+
+      .st5 {
+        stroke: #92278f;
+      }
+
+      .st6 {
+        stroke: #010101;
+      }
+    </style>
+    <filter id="drop-shadow-1" x="408.1" y="142.4" width="1121.5" height="849.1" filterUnits="userSpaceOnUse">
+      <feOffset dx="7" dy="7"/>
+      <feGaussianBlur result="blur" stdDeviation="5"/>
+      <feFlood flood-color="#231f20" flood-opacity=".8"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g class="st7">
+    <circle class="st0" cx="1380.1" cy="468.7" r="116.9" transform="translate(72.8 1113.2) rotate(-45)"/>
+    <path class="st1" d="M1126.8,904.2c280.3,0,229.6-190.1,231.3-316.8"/>
+    <path class="st2" d="M707.5,468.7c0-64.6,52.4-116.9,116.9-116.9s116.9,52.4,116.9,116.9-52.4,116.9-116.9,116.9"/>
+    <circle class="st6" cx="1102.3" cy="468.7" r="116.9"/>
+    <circle class="st4" cx="963.4" cy="587.4" r="116.9"/>
+    <path class="st2" d="M918,398.6c31.2,41.6,31.2,98.7,0,140.3"/>
+    <path class="st5" d="M429.5,468.7c0-64.6,52.4-116.9,116.9-116.9s116.9,41.2,116.9,116.9v101.7"/>
+    <path class="st3" d="M743.9,486.2c34.9,20.2,58.4,58,58.4,101.3,0,64.6-52.4,116.9-116.9,116.9s-116.9-52.4-116.9-116.9,23.5-81,58.4-101.3"/>
+    <path class="st3" d="M791.6,288.1c3.6,102.4,7.1,204.8,10.7,307.1"/>
+    <path class="st5" d="M426.8,150.7c1.6,113.3,1.1,309.9,2.8,423.2"/>
+    <circle class="st1" cx="1241.2" cy="587.4" r="116.9" transform="translate(-51.9 1049.7) rotate(-45)"/>
+    <path class="st6" d="M1195.8,398.6c31.2,41.6,31.2,98.7,0,140.3M1102.3,585.7c-25.3,0-49.9-8.2-70.2-23.4"/>
+    <path class="st0" d="M1263.1,811.3c-6.7-157.4,6.7-167.7,0-325.1"/>
+    <path class="st0" d="M1380.1,585.7c-25.3,0-49.9-8.2-70.2-23.4"/>
+    <path class="st2" d="M824.5,585.7c-64.6,0-116.9-52.4-116.9-116.9"/>
+    <path class="st3" d="M626.9,486.2c17.2-10,37.2-15.7,58.5-15.7s41.3,5.7,58.5,15.7"/>
+  </g>
+</svg>

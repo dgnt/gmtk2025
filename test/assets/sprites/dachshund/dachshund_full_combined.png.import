@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0puoe65jhsbj"
-path="res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"
+uid="uid://bwi8lg786ded6"
+path="res://.godot/imported/dachshund_full_combined.png-9a76d893acc1bf29834fd0ab63dc7f43.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/hoopdog.png"
-dest_files=["res://.godot/imported/hoopdog.png-059acfb05f2ac85151daf2bdd37757f2.ctex"]
+source_file="res://assets/sprites/dachshund/dachshund_full_combined.png"
+dest_files=["res://.godot/imported/dachshund_full_combined.png-9a76d893acc1bf29834fd0ab63dc7f43.ctex"]
 
 [params]
 

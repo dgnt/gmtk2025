@@ -1,7 +1,7 @@
 extends Node2D
 class_name HulaHoopSystem
 
-const HulaHoopResource = preload("res://scripts/systems/hula_hoop.gd")
+const HulaHoopResource = preload("res://scripts/systems/hula_hoop_resource.gd")
 
 @export var hoop: HulaHoopResource
 @export var target_bone_path: String = "CenterBone"
@@ -42,11 +42,12 @@ func cache_bone_data():
 	# Get all bones in the skeleton
 	all_bones = get_all_bones(skeleton)
 	
-	# Calculate distance from target bone for each bone
+	# IMPORTANT: Store the rest transform, not current position
+	# This ensures we capture the true rest pose
 	for bone in all_bones:
 		var distance = calculate_bone_distance(bone, target_bone)
 		bone_data[bone] = {
-			"rest_position": bone.position,
+			"rest_position": bone.rest.origin,  # Use rest transform origin
 			"distance": distance,
 			"affected": distance <= max_distance
 		}
@@ -108,6 +109,11 @@ func count_bone_steps(ancestor: Node, descendant: Node) -> int:
 		current = current.get_parent()
 	return steps
 
+func reset_bones_to_rest():
+	# Reset all bones to their rest positions
+	for bone in all_bones:
+		bone.position = bone.rest.origin
+
 func _process(delta):
 	if not enabled or not target_bone or not hoop:
 		return
@@ -115,10 +121,10 @@ func _process(delta):
 	# Phase is now controlled by the character script
 	# hoop.phase = wrapf(hoop.phase + hoop.speed * delta, 0, TAU)
 	
-	# Calculate base deformation
+	# Calculate base deformation - NEGATED X for counter-movement
 	var x_offset = cos(hoop.phase) * hoop.radius
 	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio
-	var base_deformation = Vector2(x_offset, y_offset)
+	var base_deformation = Vector2(-x_offset, y_offset)
 	
 	# Process bones from root to leaves to handle inheritance properly
 	# First, reset all bones to rest position
