@@ -64,7 +64,13 @@ func play_sfx(sound_path: String, pitch_variation: float = DEFAULT_PITCH_VARIATI
 	active_sounds[track_id] = player
 	
 	# Clean up tracking when sound finishes (for non-looping sounds)
-	if not stream.loop:
+	var is_looping = false
+	if stream.has_method("get_loop") and stream.get_loop():
+		is_looping = true
+	elif stream.get("loop") != null and stream.loop:
+		is_looping = true
+	
+	if not is_looping:
 		# Disconnect any existing connections first to avoid duplicate connections
 		if player.finished.is_connected(_on_sfx_finished):
 			player.finished.disconnect(_on_sfx_finished)
@@ -153,3 +159,7 @@ func stop_helicopter_sound(track_id: int) -> void:
 func play_jump_sound() -> int:
 	"""Play the jump sound with pitch variation."""
 	return play_sfx("res://assets/audio/sfx/JumpNoise.ogg", 0.15, -3.0)
+
+func play_airburst_sound() -> int:
+	"""Play the airburst sound for rubber snap with pitch variation."""
+	return play_sfx("res://assets/audio/sfx/airburst.wav", 0.1, 0.0)
