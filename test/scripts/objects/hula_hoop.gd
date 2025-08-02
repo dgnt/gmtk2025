@@ -39,7 +39,6 @@ var all_bones: Array = []
 
 # Stretch animation state
 var is_stretching: bool = false
-var stretch_factor: float = 1.0  # 1.0 = normal, >1.0 = stretched
 var stretch_direction: Vector2 = Vector2.RIGHT
 var stretch_time: float = 0.0
 var stretch_animation_speed: float = 8.0  # How fast the stretch animates
@@ -52,10 +51,20 @@ var stretch_duration: float = 0.4  # Duration of the stretch animation
 var original_hoop_width: float = 0.0
 var original_hoop_height: float = 0.0
 
+var dachshund_scale: Vector2 = Vector2.ONE
+
 func _ready():
 	# Don't set up components here since we need skeleton reference
 	# Everything will be set up in initialize()
 	pass
+
+func _enter_tree():
+	# Called when node enters the scene tree
+	# Safe place to get parent references
+	if get_parent():
+		var parent_node = get_parent()
+		if parent_node:
+			dachshund_scale = parent_node.scale
 
 func setup_visual_components():
 	# Prevent duplicate visual nodes
@@ -86,7 +95,7 @@ func setup_visual_components():
 	front_line.width = line_width
 	front_line.default_color = color_front
 	visual_node.add_child(front_line)
-	
+		
 	# Update the visual
 	update_hoop_visual()
 
@@ -276,22 +285,19 @@ func update_hoop_lines():
 		var right_pos = Vector2(half_width, 0)
 		
 		if is_stretching:
-			# Calculate stretch for left and right positions
-			var left_alignment = Vector2(-1, 0).dot(stretch_direction.normalized())
-			var right_alignment = Vector2(1, 0).dot(stretch_direction.normalized())
-			
-			var left_stretch_amount = pow((left_alignment + 1.0) * 0.5, 2.0)
-			var right_stretch_amount = pow((right_alignment + 1.0) * 0.5, 2.0)
-			
-			left_pos += stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * left_stretch_amount
-			right_pos += stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * right_stretch_amount
+			# The distortion positions should match the current hoop width
+			# Since hoop_width is already being lerped in update_stretch_animation
+			left_pos = Vector2(-hoop_width / 2.0, 0)
+			right_pos = Vector2(hoop_width / 2.0, 0)
 		
 		left_distortion.position = left_pos - left_distortion.size / 2.0
 		right_distortion.position = right_pos - right_distortion.size / 2.0
 		
 		# Increase distortion strength when stretching
 		if is_stretching and left_distortion.material and right_distortion.material:
-			var distortion_strength = 0.01 + (stretch_factor - 1.0) * 0.02
+			# Calculate distortion based on how much we've stretched
+			var stretch_amount = (hoop_width - original_hoop_width) / original_hoop_width if original_hoop_width > 0 else 0.0
+			var distortion_strength = 0.01 + stretch_amount * 0.02
 			left_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
 			right_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
 
@@ -377,7 +383,6 @@ func start_stretch(direction: Vector2, duration: float = 0.2, distance: float = 
 	is_stretching = true
 	stretch_direction = -direction.normalized()
 	stretch_time = 0.0
-	stretch_factor = 1.0
 	snap_distance = distance
 	stretch_duration = duration
 	
@@ -402,46 +407,45 @@ func update_stretch_animation(delta: float) -> Vector2:
 	var half_time = stretch_duration / 2.0
 	var position_offset = Vector2.ZERO
 
-	var target_width = original_hoop_width + snap_distance
+	var target_width = original_hoop_width + (snap_distance * 1/dachshund_scale.x)
 	var target_height = original_hoop_height * (target_width / original_hoop_width)
 	
 	if stretch_time < half_time:
 		# First phase: stretch out during pause (0 to 0.2s)
 		var progress = stretch_time / half_time
-		# Calculate max stretch based on snap distance
-		var calculated_max_stretch = 1.0 + (snap_distance / original_hoop_width) if original_hoop_width > 0 else 2.0
-		stretch_factor = 1.0 + (calculated_max_stretch - 1.0) * ease(progress, -2.0)
+		var eased_progress = ease(progress, -2.0)  # Ease out for smooth stretch
 		
-		# Lerp radius and position during first phase if snap_distance is set
-		if snap_distance > 0 and hoop_system and hoop_system.hoop:	
-			hoop_width = lerp(original_hoop_width, target_width, progress)
-			hoop_height = lerp(original_hoop_height, target_height, progress)
-			
-			# Calculate the position offset (negative because we subtract in _process)
-			position_offset.x = -(snap_distance / 2.0) * progress
+		# Lerp dimensions and position during first phase
+		hoop_width = lerp(original_hoop_width, target_width, eased_progress)
+		hoop_height = lerp(original_hoop_height, target_height, eased_progress)
+		
+		# Calculate the position offset (negative because we subtract in _process)
+		position_offset.x = (snap_distance / 2.0) * eased_progress
 	elif stretch_time < half_time * 2:
 		# Second phase: snap back during movement (0.2s to 0.4s)
 		var progress = (stretch_time - half_time) / half_time
-		# Calculate max stretch based on snap distance
-		var calculated_max_stretch = 1.0 + (snap_distance / original_hoop_width) if original_hoop_width > 0 else 2.0
 		
-		# Quick snap back with overshoot
+		# Quick snap back with overshoot and bounce
+		var eased_progress: float
 		if progress < 0.5:
-			# Snap back quickly
-			stretch_factor = calculated_max_stretch - (calculated_max_stretch - 0.7) * ease(progress * 2, 2.0)
+			# Snap back quickly with overshoot
+			eased_progress = ease(progress * 2, 2.0)
+			# Overshoot: go slightly past original size
+			var overshoot_width = original_hoop_width * 0.7
+			var overshoot_height = original_hoop_height * 0.7
+			hoop_width = lerp(target_width, overshoot_width, eased_progress)
+			hoop_height = lerp(target_height, overshoot_height, eased_progress)
 		else:
-			# Settle to normal with bounce
+			# Settle back to normal with bounce
 			var bounce_progress = (progress - 0.5) * 2
-			stretch_factor = 0.7 + 0.3 * ease(bounce_progress, -1.5)
+			eased_progress = ease(bounce_progress, -1.5)
+			var overshoot_width = original_hoop_width * 0.7
+			var overshoot_height = original_hoop_height * 0.7
+			hoop_width = lerp(overshoot_width, original_hoop_width, eased_progress)
+			hoop_height = lerp(overshoot_height, original_hoop_height, eased_progress)
 		
-		# Lerp radius and position back during second phase
-		if snap_distance > 0 and hoop_system and hoop_system.hoop:
-			# Restore visual dimensions
-			hoop_width = lerp(target_width, original_hoop_width, progress)
-			hoop_height = lerp(target_height, original_hoop_height, progress)
-			
-			# Calculate the position offset back
-			position_offset.x = -(snap_distance / 2.0) * (1.0 - progress)
+		# Calculate the position offset back
+		position_offset.x = (snap_distance / 2.0) * (1.0 - progress)
 	else:
 		# Animation complete
 		end_stretch()
@@ -454,7 +458,6 @@ func update_stretch_animation(delta: float) -> Vector2:
 
 func end_stretch():
 	is_stretching = false
-	stretch_factor = 1.0
 	stretch_time = 0.0
 	
 	# Restore original radius
