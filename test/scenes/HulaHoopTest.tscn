@@ -21,7 +21,7 @@ size = Vector2(2000, 50)
 [node name="GeneratedDachshund" parent="." instance=ExtResource("1_test")]
 position = Vector2(500, 300)
 
-[node name="HulaHoopSystem" parent="GeneratedDachshund" index="1"]
+[node name="HulaHoopSystem" parent="GeneratedDachshund" index="0"]
 hoop = SubResource("Resource_test_hoop")
 
 [node name="Camera2D" type="Camera2D" parent="."]

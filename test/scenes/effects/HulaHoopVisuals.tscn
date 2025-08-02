@@ -67,7 +67,7 @@ zoom = Vector2(0.8, 0.8)
 [node name="GeneratedDachshund" parent="." instance=ExtResource("1_dach")]
 position = Vector2(576, 400)
 
-[node name="HulaHoopSystem" parent="GeneratedDachshund" index="1"]
+[node name="HulaHoopSystem" parent="GeneratedDachshund" index="0"]
 hoop = SubResource("Resource_hoop_visual")
 target_bone_path = "Skeleton2D/CenterBone"
 
