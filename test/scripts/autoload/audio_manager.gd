@@ -65,6 +65,9 @@ func play_sfx(sound_path: String, pitch_variation: float = DEFAULT_PITCH_VARIATI
 	
 	# Clean up tracking when sound finishes (for non-looping sounds)
 	if not stream.loop:
+		# Disconnect any existing connections first to avoid duplicate connections
+		if player.finished.is_connected(_on_sfx_finished):
+			player.finished.disconnect(_on_sfx_finished)
 		player.finished.connect(_on_sfx_finished.bind(track_id), CONNECT_ONE_SHOT)
 	
 	sfx_played.emit(sound_path)
