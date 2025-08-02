@@ -38,13 +38,16 @@ var bone_data: Dictionary = {}
 var all_bones: Array = []
 
 func _ready():
-	# Set up visual components
-	setup_visual_components()
-	
-	# Create hoop system for bone manipulation
-	setup_hoop_system()
+	# Don't set up components here since we need skeleton reference
+	# Everything will be set up in initialize()
+	pass
 
 func setup_visual_components():
+	# Prevent duplicate visual nodes
+	if visual_node:
+		push_warning("Visual components already set up")
+		return
+		
 	# Create visual container
 	visual_node = Node2D.new()
 	visual_node.name = "Visual"
@@ -97,6 +100,11 @@ func setup_distortion_effects():
 	visual_node.add_child(right_distortion)
 
 func setup_hoop_system():
+	# Prevent duplicate hoop system
+	if hoop_system:
+		push_warning("Hoop system already set up")
+		return
+		
 	# Create HulaHoopSystem node
 	hoop_system = HulaHoopSystem.new()
 	hoop_system.name = "BoneManipulator"
