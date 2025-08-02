@@ -96,12 +96,15 @@ stretch_mode = 5
 
 [node name="PlayBone" type="Bone2D" parent="Skeleton2D"]
 position = Vector2(959, 502)
+rest = Transform2D(1, 0, 0, 1, 959, 502)
 
 [node name="SettingsBone" type="Bone2D" parent="Skeleton2D"]
 position = Vector2(959, 542)
+rest = Transform2D(1, 0, 0, 1, 959, 542)
 
 [node name="DebugBone" type="Bone2D" parent="Skeleton2D"]
 position = Vector2(960, 579)
+rest = Transform2D(1, 0, 0, 1, 960, 579)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0

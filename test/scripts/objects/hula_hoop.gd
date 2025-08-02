@@ -261,6 +261,8 @@ func set_target_bone(bone_path: String):
 		if target_bone:
 			if hoop_system:
 				hoop_system.target_bone_path = bone_path
+				# Re-initialize the hoop system to find the new target bone
+				hoop_system.initialize(skeleton_ref)
 			cache_bone_data()
 
 func set_tilt_angle(angle: float):
