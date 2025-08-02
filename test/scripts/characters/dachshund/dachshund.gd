@@ -365,6 +365,8 @@ func jump(direction):
 		velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
 	air_momentum = velocity
 	jump_processed = false
+	# Play jump sound
+	AudioManager.play_jump_sound()
 
 func charge_process(delta, pressed):
 	if "B0" in pressed:

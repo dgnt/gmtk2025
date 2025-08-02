@@ -146,3 +146,7 @@ func play_helicopter_sound() -> int:
 func stop_helicopter_sound(track_id: int) -> void:
 	"""Stop the helicopter sound."""
 	stop_sfx(track_id)
+
+func play_jump_sound() -> int:
+	"""Play the jump sound with pitch variation."""
+	return play_sfx("res://assets/audio/sfx/JumpNoise.ogg", 0.15, -3.0)

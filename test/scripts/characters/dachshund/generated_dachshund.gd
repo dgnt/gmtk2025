@@ -330,6 +330,9 @@ func jump(direction):
 		velocity.y += cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
 	air_momentum = velocity
 	jump_processed = false
+	# Play jump animation
+	if $AnimationPlayer.has_animation("jump"):
+		$AnimationPlayer.play("jump")
 
 func charge_process(delta, pressed):
 	if "B0" in pressed:

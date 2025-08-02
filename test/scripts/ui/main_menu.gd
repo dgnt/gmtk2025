@@ -30,6 +30,9 @@ func _ready():
 	
 	# Set up hula hoop effect
 	setup_hula_hoop_effect()
+	
+	# Start menu music
+	AudioManager.play_music("res://assets/audio/music/HoopDogMenu.ogg", -6.0, 0.5)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -46,6 +49,8 @@ func _process(delta: float) -> void:
 	
 func _on_play_button_pressed():
 	print("Play button pressed! Starting game flow...")
+	# Stop menu music before transitioning
+	AudioManager.stop_music(0.3)
 	# Tell the global GameFlow singleton to load the first level
 	GameFlow.start_new_game() # Load the level at index 0 (Level1.tscn)
 
@@ -68,6 +73,10 @@ func _on_debug_button_pressed():
 	# Optional: Pause the main menu or dim the background
 	# get_tree().paused = true
 	# modulate = Color(0.5, 0.5, 0.5, 1.0)  # Dim the main menu
+
+func _exit_tree():
+	# Stop music when leaving the main menu
+	AudioManager.stop_music(0.2)
 
 func setup_hula_hoop_effect():
 	# Create hula hoop using the factory
