@@ -42,6 +42,8 @@ const HELI_REV_TIME = 0.15 # s
 
 # Hoop instance
 var hoop_instance: HulaHoop = null
+const DEFAULT_HOOP_TARGET = "CenterBone/LowerSpine"
+const HELICOPTER_HOOP_TARGET = "CenterBone/LowerChest/Chest/Neck/Head"
 
 # B0 Ground: Hypercharge
 # B0 Air: Ground-poundish
@@ -239,9 +241,13 @@ func hyper_airtime(delta) -> bool: # retval is skip rest of controls
 func start_heli():
 	if helicoptering: return
 	helicoptering = true
-	if hoop_instance and hoop_instance.visual_node:
-		hoop_instance.visual_node.rotation = 0
-		hoop_instance.position = HELI_TRANSPOSE
+	if hoop_instance:
+		# Change target bone to head for helicopter effect
+		hoop_instance.set_target_bone(HELICOPTER_HOOP_TARGET)
+		# Reset visual rotation and position - hoop will follow head automatically
+		if hoop_instance.visual_node:
+			hoop_instance.visual_node.rotation = 0
+		hoop_instance.position = Vector2.ZERO
 
 func heli_rev(delta):
 	if hoop_instance:
@@ -253,6 +259,8 @@ func end_heli():
 	if not helicoptering: return
 	helicoptering = false
 	if hoop_instance:
+		# Restore target bone back to lower spine
+		hoop_instance.set_target_bone(DEFAULT_HOOP_TARGET)
 		hoop_instance.position = Vector2.ZERO
 
 func helicopter(direction):
@@ -393,7 +401,7 @@ func _ready() -> void:
 		hoop_instance = HulaHoopFactory.create_basic_hoop(skeleton)
 		# Customize the hoop for dachshund
 		hoop_instance.set_colors(Color(1, 0.109804, 0.0588235, 1), Color(0.556863, 0.121569, 0.141176, 1))
-		hoop_instance.set_target_bone("CenterBone/LowerSpine")
+		hoop_instance.set_target_bone(DEFAULT_HOOP_TARGET)
 		add_child(hoop_instance)
 
 func sane_coord(point: Vector2) -> Vector2:

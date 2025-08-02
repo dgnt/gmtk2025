@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://by8emlu68l1l2"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_3x3kq"]
-[ext_resource type="Texture2D" uid="uid://b0puoe65jhsbj" path="res://assets/hoopdog.png" id="2_ql02a"]
+[ext_resource type="Texture2D" uid="uid://rnusgv62sk8l" path="res://assets/images/hoopdog-scribble-01.png" id="2_e1r35"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -14,16 +14,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_3x3kq")
 
+[node name="Logo" type="TextureRect" parent="."]
+offset_left = -3040.0
+offset_top = -1653.0
+offset_right = 4960.0
+offset_bottom = 2847.0
+texture = ExtResource("2_e1r35")
+
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 color = Color(0.14902, 0.14902, 0.14902, 0)
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(988, 482)
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("2_ql02a")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

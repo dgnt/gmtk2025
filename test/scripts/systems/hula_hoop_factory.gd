@@ -50,9 +50,9 @@ static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHo
 static func create_basic_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
 		"path_width": 80.0,
-		"path_height": 48.0,
-		"hoop_width": 20.0,
-		"hoop_height": 12.0,
+		"path_height": 8.0,
+		"hoop_width": 600.0,
+		"hoop_height": 60.0,
 		"speed_multiplier": 1.0,
 		"color_front": Color.RED,
 		"color_back": Color.DARK_RED

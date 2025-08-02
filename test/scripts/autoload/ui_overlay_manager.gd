@@ -83,6 +83,23 @@ func create_fullscreen_button():
 	# Connect signal
 	fullscreen_button.pressed.connect(_on_fullscreen_pressed)
 
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE:
+			# Only exit fullscreen if currently in fullscreen mode
+			if OS.get_name() == "Web":
+				# Check if in fullscreen for HTML5
+				var js_check = """
+				document.fullscreenElement !== null
+				"""
+				var is_fullscreen = JavaScriptBridge.eval(js_check)
+				if is_fullscreen:
+					JavaScriptBridge.eval("document.exitFullscreen();")
+			else:
+				# Check if in fullscreen for desktop
+				if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
 func _on_fullscreen_pressed():
 	print("UIOverlay: Fullscreen button pressed")
 	
