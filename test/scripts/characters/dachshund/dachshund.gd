@@ -37,6 +37,7 @@ var charge_processed = true
 var heli_processed = true
 var helicoptering = false
 var helicopter_sound_id: int = -1
+var airburst_sound_id: int = -1
 const HELI_TRANSPOSE = Vector2(0, -360)
 const HELI_REV_TIME = 0.15 # s
 
@@ -144,6 +145,8 @@ func rubber_snap(direction):
 	velocity = air_momentum
 	clear_fall_type("airsnap")
 	update_hoop()
+	# Play airburst sound effect
+	AudioManager.play_airburst_sound()
 
 func snap_to(delta) -> bool:
 	if snap_target == null or snapping_time <= 0:
