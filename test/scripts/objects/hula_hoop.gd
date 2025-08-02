@@ -42,7 +42,7 @@ var is_stretching: bool = false
 var stretch_factor: float = 1.0  # 1.0 = normal, >1.0 = stretched
 var stretch_direction: Vector2 = Vector2.RIGHT
 var stretch_time: float = 0.0
-var max_stretch: float = 3.0  # Maximum stretch multiplier
+var max_stretch: float = 2.0  # Maximum stretch multiplier
 var stretch_animation_speed: float = 8.0  # How fast the stretch animates
 
 func _ready():
@@ -235,52 +235,58 @@ func update_hoop_lines():
 	var half_width = hoop_width / 2.0
 	var half_height = hoop_height / 2.0
 	
-	# Apply stretch deformation
-	var stretch_along = abs(stretch_direction.normalized().x)  # How much stretch is horizontal
-	var stretch_perp = abs(stretch_direction.normalized().y)   # How much stretch is vertical
-	
-	# Stretch horizontally based on direction, compress perpendicular
-	var width_factor = 1.0 + (stretch_factor - 1.0) * stretch_along
-	var height_factor = 1.0 / (1.0 + (stretch_factor - 1.0) * 0.5)  # Compress height when stretching
-	
-	# If stretching vertically, swap the factors
-	if stretch_perp > stretch_along:
-		var temp = width_factor
-		width_factor = height_factor
-		height_factor = 1.0 + (stretch_factor - 1.0) * stretch_perp
-	
-	var stretched_width = half_width * width_factor
-	var stretched_height = half_height * height_factor
-	
 	# Front half (bottom arc)
 	var front_points = []
 	for i in range(9):  # More points for smoother deformation
 		var t = i / 8.0
-		var x = lerp(-stretched_width, stretched_width, t)
-		var y = stretched_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var base_x = lerp(-half_width, half_width, t)
+		var base_y = half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var point = Vector2(base_x, base_y)
 		
-		# Apply directional stretch offset
+		# Apply asymmetric stretch based on direction
 		if is_stretching:
-			var offset = stretch_direction.normalized() * (stretch_factor - 1.0) * 10.0
-			x += offset.x * (1.0 - abs(t - 0.5) * 2.0)  # Less offset at edges
-			y += offset.y * (1.0 - abs(t - 0.5) * 2.0)
+			# Calculate how aligned this point is with the stretch direction
+			# 1.0 = perfectly aligned (front), -1.0 = opposite (rear)
+			var point_angle = point.normalized()
+			var alignment = point_angle.dot(stretch_direction.normalized())
+			
+			# Remap alignment from [-1, 1] to [0, 1] where 0 is rear, 1 is front
+			var stretch_amount = (alignment + 1.0) * 0.5
+			
+			# Apply exponential curve for more dramatic front stretch
+			stretch_amount = pow(stretch_amount, 2.0)
+			
+			# Calculate the stretch offset for this point
+			var point_stretch = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * stretch_amount
+			point += point_stretch
 		
-		front_points.append(Vector2(x, y))
+		front_points.append(point)
 	
 	# Back half (top arc)
 	var back_points = []
 	for i in range(9):  # More points for smoother deformation
 		var t = i / 8.0
-		var x = lerp(-stretched_width, stretched_width, t)
-		var y = -stretched_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var base_x = lerp(-half_width, half_width, t)
+		var base_y = -half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var point = Vector2(base_x, base_y)
 		
-		# Apply directional stretch offset
+		# Apply asymmetric stretch based on direction
 		if is_stretching:
-			var offset = stretch_direction.normalized() * (stretch_factor - 1.0) * 10.0
-			x += offset.x * (1.0 - abs(t - 0.5) * 2.0)  # Less offset at edges
-			y += offset.y * (1.0 - abs(t - 0.5) * 2.0)
+			# Calculate how aligned this point is with the stretch direction
+			var point_angle = point.normalized()
+			var alignment = point_angle.dot(stretch_direction.normalized())
+			
+			# Remap alignment from [-1, 1] to [0, 1] where 0 is rear, 1 is front
+			var stretch_amount = (alignment + 1.0) * 0.5
+			
+			# Apply exponential curve for more dramatic front stretch
+			stretch_amount = pow(stretch_amount, 2.0)
+			
+			# Calculate the stretch offset for this point
+			var point_stretch = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * stretch_amount
+			point += point_stretch
 		
-		back_points.append(Vector2(x, y))
+		back_points.append(point)
 	
 	front_line.points = front_points
 	back_line.points = back_points
@@ -293,9 +299,20 @@ func update_hoop_lines():
 	
 	# Update distortion effect positions and strength
 	if left_distortion and right_distortion:
-		# Position distortions at the leftmost and rightmost points
-		var left_pos = Vector2(-stretched_width, 0)
-		var right_pos = Vector2(stretched_width, 0)
+		# Find the actual leftmost and rightmost points after stretch
+		var left_pos = Vector2(-half_width, 0)
+		var right_pos = Vector2(half_width, 0)
+		
+		if is_stretching:
+			# Calculate stretch for left and right positions
+			var left_alignment = Vector2(-1, 0).dot(stretch_direction.normalized())
+			var right_alignment = Vector2(1, 0).dot(stretch_direction.normalized())
+			
+			var left_stretch_amount = pow((left_alignment + 1.0) * 0.5, 2.0)
+			var right_stretch_amount = pow((right_alignment + 1.0) * 0.5, 2.0)
+			
+			left_pos += stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * left_stretch_amount
+			right_pos += stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * right_stretch_amount
 		
 		left_distortion.position = left_pos - left_distortion.size / 2.0
 		right_distortion.position = right_pos - right_distortion.size / 2.0
@@ -326,8 +343,16 @@ func _process(delta: float):
 	if target_bone:
 		var x_offset = cos(current_phase) * (path_width / 2.0)
 		var y_offset = sin(current_phase) * (path_height / 2.0)
-		# No need to rotate offset since visual_node handles rotation
-		global_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
+		var base_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
+		
+		# Offset position during stretch to keep rear edge fixed
+		if is_stretching:
+			# The hoop should appear to stretch forward, so we offset it backward
+			# by half the stretch amount to keep the rear edge in place
+			var stretch_offset = stretch_direction.normalized() * (stretch_factor - 1.0) * hoop_width * 0.5
+			base_position -= stretch_offset
+		
+		global_position = base_position
 		
 
 # Public API methods
@@ -382,7 +407,7 @@ func set_colors(front: Color, back: Color):
 # Stretch animation methods
 func start_stretch(direction: Vector2, duration: float = 0.2):
 	is_stretching = true
-	stretch_direction = direction.normalized()
+	stretch_direction = -direction.normalized()
 	stretch_time = 0.0
 	stretch_factor = 1.0
 	
