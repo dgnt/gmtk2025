@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="Test"
-run/main_scene="res://scenes/SplashScreen.tscn"
+run/main_scene="res://scenes/ui/SplashScreen.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GameFlow="*res://scripts/game_flow.gd"
-UIOverlay="*res://scripts/ui_overlay_manager.gd"
+GameFlow="*res://scripts/autoload/game_flow.gd"
+UIOverlay="*res://scripts/autoload/ui_overlay_manager.gd"
 
 [display]
 
