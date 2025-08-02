@@ -17,8 +17,9 @@ var hypercharge = 0
 var hyperdirection = Vector2(0, -1)
 var air_momentum = Vector2.ZERO
 const MAX_FALL = 500
-const CHARGE_TIME = 2000.0 # ms
-const FULL_CHARGE = 2.0
+const CHARGE_TIME = 2 # s
+const FULL_CHARGE = 3
+const CHARGE_SPEED = 1000
 const HELI_MAX = 1.5 # s
 var heli_charges = 0
 var heli_time = 0
@@ -93,7 +94,6 @@ func ground_control(delta, pressed, direction):
 	direct_player(direction, pressed)
 	hoop_directing(direction)
 	if hypercharging(delta, direction, "B0" in pressed):
-		update_hoop()
 		return
 	walk(direction)
 	if "B1" in pressed:
@@ -176,8 +176,8 @@ func snap_to(delta) -> bool:
 func hyper_airtime(delta) -> bool: # retval is skip rest of controls
 	if hypercharge > 0:
 		air_momentum += get_gravity() * delta * (1 - hypercharge/CHARGE_TIME)
-		velocity = air_momentum + hyperdirection * (1+hypercharge/CHARGE_TIME*FULL_CHARGE) * HOOP_SPEED
-		hypercharge -= delta * 1000
+		velocity = air_momentum
+		hypercharge -= delta
 		if hypercharge <= 0:
 			hypercharge = 0
 			return false
@@ -263,19 +263,25 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 	velocity.x = 0
 	if charging:
 		charge_processed = false
-		hypercharge += delta * 1000.0
+		hypercharge += delta
 		var old_rev = rev
 		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
 		if hypercharge >= CHARGE_TIME:
 			if ($Body.transform.x.x > 0 and rev < old_rev):
 				rev = 0
-				hyperdirection = direction
-				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
+				hyperdirection = direction.normalized()
+				air_momentum = hyperdirection * CHARGE_SPEED
+				velocity = air_momentum
+				#hypercharge = 0
+				return false
 			elif ($Body.transform.x.x < 0 and old_rev < 0.5 and rev > 0.5):
 				rev = 0.5
-				hyperdirection = direction
-				velocity = hyperdirection * (1+FULL_CHARGE) * HOOP_SPEED
+				hyperdirection = direction.normalized()
+				air_momentum = hyperdirection * CHARGE_SPEED
+				velocity = air_momentum
+				#hypercharge = 0
+				return false
 				# TODO: Punish hypercharging into the ground
 			else:
 				hypercharge = CHARGE_TIME
@@ -332,7 +338,7 @@ func jump(direction):
 
 func charge_process(delta, pressed):
 	if "B0" in pressed:
-		hypercharge += delta * 1000
+		hypercharge += delta
 		if hypercharge > CHARGE_TIME:
 			hypercharge = CHARGE_TIME
 	else:

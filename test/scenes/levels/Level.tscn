@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=4 uid="uid://d23267lvc8rb1"]
+[gd_scene load_steps=5 format=4 uid="uid://50xnyxqmcqwe"]
 
 [ext_resource type="Texture2D" uid="uid://xe2lai8nlm84" path="res://icon.svg" id="1_8gjw8"]
 [ext_resource type="PackedScene" uid="uid://b4nwmwnep3xc0" path="res://scenes/characters/GeneratedDachshund.tscn" id="2_p4u4o"]
