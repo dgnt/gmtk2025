@@ -2,6 +2,10 @@ extends CharacterBody2D
 
 signal level_failed
 
+# Preload the HulaHoopFactory
+const HulaHoopFactory = preload("res://scripts/systems/hula_hoop_factory.gd")
+const HulaHoop = preload("res://scripts/objects/hula_hoop.gd")
+
 # Physics and control values
 @export var speed = 300.0
 @export var jump_velocity = -600.0
@@ -35,6 +39,9 @@ var heli_processed = true
 var helicoptering = false
 const HELI_TRANSPOSE = Vector2(0, -360)
 const HELI_REV_TIME = 0.15 # s
+
+# Hoop instance
+var hoop_instance: HulaHoop = null
 
 # B0 Ground: Hypercharge
 # B0 Air: Ground-poundish
@@ -83,10 +90,12 @@ func _physics_process(delta: float) -> void:
 		rev += delta * 1000 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
 		lookup = "move_up" in pressed
-		$Path2D.rotation = 0 if not lookup else bod.transform.x.x * -45
+		if hoop_instance and hoop_instance.visual_node:
+			hoop_instance.visual_node.rotation = 0 if not lookup else bod.transform.x.x * -45
 	
-	var hooper = get_node("Path2D/PathFollow2D")
-	hooper.progress_ratio = rev
+	# Update hoop phase
+	if hoop_instance:
+		hoop_instance.current_phase = rev * TAU
 	
 	# Handle jump.
 	if "jump" in pressed and is_on_floor():
@@ -170,17 +179,19 @@ func air_control(delta, pressed, direction):
 	velocity.x += (1 if direction.x > 0 else -1) * speed
 
 func update_hoop():
-	$Path2D/PathFollow2D.progress_ratio = rev
+	if hoop_instance:
+		hoop_instance.current_phase = rev * TAU
 
 func hoop_directing(direction):
-	if direction:
-		$Path2D.rotation = direction.angle()
-	else:
-		$Path2D.rotation = (Vector2(1 if forward else -1,0)).angle()
-	if $Path2D.rotation > PI/2:
-		$Path2D.rotation -= PI
-	elif $Path2D.rotation < -PI/2:
-		$Path2D.rotation += PI
+	if hoop_instance and hoop_instance.visual_node:
+		if direction:
+			hoop_instance.visual_node.rotation = direction.angle()
+		else:
+			hoop_instance.visual_node.rotation = (Vector2(1 if forward else -1,0)).angle()
+		if hoop_instance.visual_node.rotation > PI/2:
+			hoop_instance.visual_node.rotation -= PI
+		elif hoop_instance.visual_node.rotation < -PI/2:
+			hoop_instance.visual_node.rotation += PI
 	
 func rubber_snap(direction):
 	if air_snaps <= 0: return
@@ -228,16 +239,21 @@ func hyper_airtime(delta) -> bool: # retval is skip rest of controls
 func start_heli():
 	if helicoptering: return
 	helicoptering = true
-	$Path2D.rotation = 0
-	$Path2D.position = HELI_TRANSPOSE
+	if hoop_instance and hoop_instance.visual_node:
+		hoop_instance.visual_node.rotation = 0
+		hoop_instance.position = HELI_TRANSPOSE
 
 func heli_rev(delta):
-	$Path2D/PathFollow2D.progress_ratio += delta / HELI_REV_TIME
+	if hoop_instance:
+		rev += delta / HELI_REV_TIME
+		rev = fmod(rev, 1.0)
+		hoop_instance.current_phase = rev * TAU
 
 func end_heli():
 	if not helicoptering: return
 	helicoptering = false
-	$Path2D.position = Vector2.ZERO
+	if hoop_instance:
+		hoop_instance.position = Vector2.ZERO
 
 func helicopter(direction):
 	if heli_charges <= 0: return
@@ -370,7 +386,15 @@ func _ready() -> void:
 	# make_torso()
 	# make_head()
 	print("Hitbox size is ", get_hitbox_dimensions())
-	pass # Replace with function body.
+	
+	# Create hoop using factory
+	var skeleton = $Body/Skeleton2D
+	if skeleton:
+		hoop_instance = HulaHoopFactory.create_basic_hoop(skeleton)
+		# Customize the hoop for dachshund
+		hoop_instance.set_colors(Color(1, 0.109804, 0.0588235, 1), Color(0.556863, 0.121569, 0.141176, 1))
+		hoop_instance.set_target_bone("CenterBone/LowerSpine")
+		add_child(hoop_instance)
 
 func sane_coord(point: Vector2) -> Vector2:
 	return Vector2(point.x, HEIGHT - point.y)
