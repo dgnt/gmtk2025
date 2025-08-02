@@ -37,6 +37,7 @@ var jump_processed = true
 var charge_processed = true
 var heli_processed = true
 var helicoptering = false
+var helicopter_sound_id: int = -1
 const HELI_TRANSPOSE = Vector2(0, -360)
 const HELI_REV_TIME = 0.15 # s
 
@@ -242,6 +243,8 @@ func hyper_airtime(delta) -> bool: # retval is skip rest of controls
 func start_heli():
 	if helicoptering: return
 	helicoptering = true
+	# Play helicopter sound with pitch variation
+	helicopter_sound_id = AudioManager.play_helicopter_sound()
 	if hoop_instance:
 		# Change target bone to head for helicopter effect
 		hoop_instance.set_target_bone(HELICOPTER_HOOP_TARGET)
@@ -259,6 +262,10 @@ func heli_rev(delta):
 func end_heli():
 	if not helicoptering: return
 	helicoptering = false
+	# Stop helicopter sound
+	if helicopter_sound_id != -1:
+		AudioManager.stop_helicopter_sound(helicopter_sound_id)
+		helicopter_sound_id = -1
 	if hoop_instance:
 		# Restore target bone back to lower spine
 		hoop_instance.set_target_bone(DEFAULT_HOOP_TARGET)
@@ -294,6 +301,9 @@ func helicopter_fall(delta, pressed, direction) -> bool:
 func clear_fall_type(except):
 	if except != "helicopter" and heli_time < HELI_MAX:
 		heli_time = 0
+		# Stop helicopter sound if clearing helicopter mode
+		if helicoptering:
+			end_heli()
 	if except != "airsnap" and snapping_time < SNAP_TIME:
 		snapping_time = 0
 		snap_target = null
@@ -423,6 +433,10 @@ func _process(delta: float) -> void:
 	pass
 
 func die() -> void:
+	# Stop helicopter sound if playing
+	if helicopter_sound_id != -1:
+		AudioManager.stop_helicopter_sound(helicopter_sound_id)
+		helicopter_sound_id = -1
 	level_failed.emit()
 	set_deferred("monitoring", false) # Disable monitoring after first trigger
 	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED) # Disable script processing
