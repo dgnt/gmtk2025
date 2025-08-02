@@ -49,8 +49,8 @@ static func create_hoop(skeleton: Skeleton2D, params: Dictionary = {}) -> HulaHo
 # Preset factory methods for common hoop types
 static func create_basic_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {
-		"path_width": 80.0,
-		"path_height": 8.0,
+		"path_width": 60.0,
+		"path_height": 6.0,
 		"hoop_width": 600.0,
 		"hoop_height": 60.0,
 		"speed_multiplier": 1.0,
