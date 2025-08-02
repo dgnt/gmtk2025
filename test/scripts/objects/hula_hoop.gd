@@ -322,7 +322,7 @@ func _process(delta: float):
 		# Update stretch animation
 		if is_stretching:
 			var stretch_offset = update_stretch_animation(delta)
-			base_position -= stretch_offset
+			base_position += stretch_offset
 		
 		global_position = base_position
 	
@@ -420,7 +420,8 @@ func update_stretch_animation(delta: float) -> Vector2:
 		hoop_height = lerp(original_hoop_height, target_height, eased_progress)
 		
 		# Calculate the position offset (negative because we subtract in _process)
-		position_offset.x = (snap_distance / 2.0) * eased_progress
+		position_offset.x = -(snap_distance / 2.0) * eased_progress * stretch_direction.x
+		position_offset.y = -(snap_distance / 2.0) * eased_progress * stretch_direction.y
 	elif stretch_time < half_time * 2:
 		# Second phase: snap back during movement (0.2s to 0.4s)
 		var progress = (stretch_time - half_time) / half_time
@@ -445,7 +446,8 @@ func update_stretch_animation(delta: float) -> Vector2:
 			hoop_height = lerp(overshoot_height, original_hoop_height, eased_progress)
 		
 		# Calculate the position offset back
-		position_offset.x = (snap_distance / 2.0) * (1.0 - progress)
+		position_offset.x = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.x
+		position_offset.y = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.y
 	else:
 		# Animation complete
 		end_stretch()
