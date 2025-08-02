@@ -42,11 +42,12 @@ func cache_bone_data():
 	# Get all bones in the skeleton
 	all_bones = get_all_bones(skeleton)
 	
-	# Calculate distance from target bone for each bone
+	# IMPORTANT: Store the rest transform, not current position
+	# This ensures we capture the true rest pose
 	for bone in all_bones:
 		var distance = calculate_bone_distance(bone, target_bone)
 		bone_data[bone] = {
-			"rest_position": bone.position,
+			"rest_position": bone.rest.origin,  # Use rest transform origin
 			"distance": distance,
 			"affected": distance <= max_distance
 		}
@@ -108,9 +109,13 @@ func count_bone_steps(ancestor: Node, descendant: Node) -> int:
 		current = current.get_parent()
 	return steps
 
+func reset_bones_to_rest():
+	# Reset all bones to their rest positions
+	for bone in all_bones:
+		bone.position = bone.rest.origin
+
 func _process(delta):
 	if not enabled or not target_bone or not hoop:
-		print("HulaHoopSystem disabled - enabled:", enabled, " target_bone:", target_bone != null, " hoop:", hoop != null)
 		return
 	
 	# Phase is now controlled by the character script
@@ -121,21 +126,11 @@ func _process(delta):
 	var y_offset = sin(hoop.phase) * hoop.radius * hoop.ellipse_ratio
 	var base_deformation = Vector2(-x_offset, y_offset)
 	
-	# Debug prints
-	print("HulaHoopSystem - phase:", hoop.phase, " deformation:", base_deformation, " max_dist:", max_distance)
-	
 	# Process bones from root to leaves to handle inheritance properly
 	# First, reset all bones to rest position
 	for bone in all_bones:
 		var data = bone_data[bone]
 		bone.position = data.rest_position
-	
-	# Count affected bones for debugging
-	var affected_count = 0
-	for bone in all_bones:
-		if bone_data[bone].affected:
-			affected_count += 1
-	print("Affected bones:", affected_count, " out of ", all_bones.size())
 	
 	# Apply deformation to affected bones only
 	for bone in all_bones:
@@ -148,7 +143,6 @@ func _process(delta):
 			
 			# Apply deformation as offset from rest position
 			bone.position = data.rest_position + base_deformation * influence
-			print("Moving bone:", bone.name, " dist:", distance, " influence:", influence)
 	
 	# For unaffected bones that are children of affected bones,
 	# we need to compensate for their parent's movement

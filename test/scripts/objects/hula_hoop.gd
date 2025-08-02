@@ -257,6 +257,10 @@ func get_speed_multiplier() -> float:
 func set_target_bone(bone_path: String):
 	target_bone_path = bone_path
 	if skeleton_ref and bone_path:
+		# Reset bones to rest before changing target
+		if hoop_system and hoop_system.has_method("reset_bones_to_rest"):
+			hoop_system.reset_bones_to_rest()
+		
 		target_bone = skeleton_ref.get_node(bone_path) as Bone2D
 		if target_bone:
 			if hoop_system:
