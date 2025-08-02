@@ -1,10 +1,10 @@
-[gd_scene load_steps=6 format=4 uid="uid://b1ui3kskassa3"]
+[gd_scene load_steps=6 format=4 uid="uid://cq7juvddugpl0"]
 
 [ext_resource type="Script" path="res://scripts/levels/generic_level.gd" id="1_vs4qf"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="2_6oh8u"]
 [ext_resource type="Texture2D" uid="uid://b2846nt1myo0q" path="res://assets/images/Background_2.png" id="2_mi45f"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_jei7p"]
-[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_vntws"]
+[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_vntws"]
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_vs4qf")
