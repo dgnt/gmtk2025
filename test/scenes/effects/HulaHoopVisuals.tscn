@@ -1,0 +1,156 @@
+[gd_scene load_steps=12 format=3 uid="uid://c60u8pws01b52"]
+
+[ext_resource type="PackedScene" uid="uid://b4nwmwnep3xc0" path="res://scenes/characters/GeneratedDachshund.tscn" id="1_dach"]
+[ext_resource type="Script" path="res://scripts/systems/hula_hoop.gd" id="2_hoop_res"]
+[ext_resource type="Texture2D" uid="uid://cy8lrw3iisroi" path="res://assets/images/park_no_bg.png" id="3_bg"]
+[ext_resource type="Script" path="res://scripts/systems/hula_hoop_visual.gd" id="4_vis_script"]
+
+[sub_resource type="Resource" id="Resource_hoop_visual"]
+script = ExtResource("2_hoop_res")
+position = 0.5
+radius = 50.0
+speed = 2.5
+phase = 0.0
+influence_range = 0.3
+intensity = 1.0
+ellipse_ratio = 0.7
+
+[sub_resource type="Gradient" id="Gradient_hoop_colors"]
+offsets = PackedFloat32Array(0, 0.3, 0.6, 1)
+colors = PackedColorArray(1, 0.2, 0.2, 1, 1, 0.8, 0.2, 1, 0.2, 1, 0.2, 1, 0.2, 0.2, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hoop"]
+gradient = SubResource("Gradient_hoop_colors")
+width = 256
+height = 256
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Curve" id="Curve_particles"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_alpha"]
+curve = SubResource("Curve_particles")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparkles"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(100, 100, 1)
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 20.0
+initial_velocity_max = 50.0
+angular_velocity_min = -180.0
+angular_velocity_max = 180.0
+gravity = Vector3(0, 100, 0)
+scale_min = 0.5
+scale_max = 1.5
+color = Color(1, 0.9, 0.3, 1)
+alpha_curve = SubResource("CurveTexture_alpha")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor_rect"]
+size = Vector2(2000, 100)
+
+[node name="HulaHoopVisuals" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+modulate = Color(0.8, 0.8, 0.8, 1)
+position = Vector2(576, 324)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("3_bg")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+zoom = Vector2(0.8, 0.8)
+
+[node name="GeneratedDachshund" parent="." instance=ExtResource("1_dach")]
+position = Vector2(576, 400)
+
+[node name="HulaHoopSystem" parent="GeneratedDachshund" index="0"]
+hoop = SubResource("Resource_hoop_visual")
+target_bone_path = "Skeleton2D/CenterBone"
+
+[node name="HulaHoopVisual" type="Node2D" parent="GeneratedDachshund"]
+z_index = -1
+script = ExtResource("4_vis_script")
+
+[node name="HoopSprite" type="Sprite2D" parent="GeneratedDachshund/HulaHoopVisual"]
+modulate = Color(1, 0.5, 0.5, 0.7)
+scale = Vector2(0.6, 0.4)
+texture = SubResource("GradientTexture2D_hoop")
+
+[node name="HoopOutline" type="Line2D" parent="GeneratedDachshund/HulaHoopVisual"]
+width = 8.0
+default_color = Color(0.9, 0.2, 0.2, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="ParticleEffects" type="Node2D" parent="GeneratedDachshund"]
+
+[node name="Sparkles" type="GPUParticles2D" parent="GeneratedDachshund/ParticleEffects"]
+amount = 20
+process_material = SubResource("ParticleProcessMaterial_sparkles")
+lifetime = 2.0
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(576, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_floor_rect")
+
+[node name="ColorRect" type="ColorRect" parent="Floor"]
+offset_left = -1000.0
+offset_top = -50.0
+offset_right = 1000.0
+offset_bottom = 50.0
+color = Color(0.3, 0.5, 0.3, 1)
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 500.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 32
+text = "Hula Hoop Visual Scene"
+
+[node name="Instructions" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 80.0
+offset_right = 500.0
+offset_bottom = 180.0
+theme_override_font_sizes/font_size = 18
+text = "Visual elements for hula hoop system
+- Hoop visual follows the character's movement
+- Particles and effects can be added
+- Press ESC to return to menu"
+
+[node name="DebugInfo" type="Label" parent="UI"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 14
+text = "Debug Info:
+Hoop Position: 0.5
+Radius: 50px
+Speed: 2.5 rad/s"
+horizontal_alignment = 2
+
+[editable path="GeneratedDachshund"]
