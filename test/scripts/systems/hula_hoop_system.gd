@@ -14,7 +14,7 @@ var all_bones: Array = []
 
 func _ready():
 	# Find the skeleton in the parent
-	skeleton = get_node("../Skeleton2D") as Skeleton2D
+	skeleton = get_node("../Body/Skeleton2D") as Skeleton2D
 	if not skeleton:
 		push_error("HulaHoopSystem: Could not find Skeleton2D in parent")
 		return

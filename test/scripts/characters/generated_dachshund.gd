@@ -5,7 +5,7 @@ signal level_failed
 @export var jump_velocity = -600.0
 
 @onready var animation_player = $AnimationPlayer
-@onready var skeleton = $Skeleton2D
+@onready var skeleton = $Body/Skeleton2D
 @onready var facing_forward = true
 
 const REV_TIME = 800  # ms
@@ -229,68 +229,6 @@ func setup_animations():
 	# Find the AnimationPlayer
 	var animation_player = get_node("AnimationPlayer")
 	
-	# Create the idle animation
-	var idle_anim = Animation.new()
-	idle_anim.length = 2.0
-	idle_anim.loop_mode = Animation.LOOP_LINEAR
-	
-	# CenterBone rotation sway - increased for visibility
-	var center_bone_track = idle_anim.add_track(Animation.TYPE_VALUE)
-	idle_anim.track_set_path(center_bone_track, NodePath("Skeleton2D:CenterBone:rotation"))
-	idle_anim.track_set_interpolation_type(center_bone_track, Animation.INTERPOLATION_CUBIC)
-	idle_anim.track_insert_key(center_bone_track, 0.0, 0.0)
-	idle_anim.track_insert_key(center_bone_track, 0.5, 0.5)  # Increased from 0.05 to 0.5
-	idle_anim.track_insert_key(center_bone_track, 1.0, 0.0)
-	idle_anim.track_insert_key(center_bone_track, 1.5, -0.5)  # Increased from -0.05 to -0.5
-	idle_anim.track_insert_key(center_bone_track, 2.0, 0.0)
-	
-	# LowerSpine rotation sway
-	var lower_spine_track = idle_anim.add_track(Animation.TYPE_VALUE)
-	idle_anim.track_set_path(lower_spine_track, NodePath("Skeleton2D:CenterBone/LowerSpine:rotation"))
-	idle_anim.track_set_interpolation_type(lower_spine_track, Animation.INTERPOLATION_CUBIC)
-	idle_anim.track_insert_key(lower_spine_track, 0.0, 0.0)
-	idle_anim.track_insert_key(lower_spine_track, 0.5, -0.03)
-	idle_anim.track_insert_key(lower_spine_track, 1.0, 0.0)
-	idle_anim.track_insert_key(lower_spine_track, 1.5, 0.03)
-	idle_anim.track_insert_key(lower_spine_track, 2.0, 0.0)
-	
-	# LowerChest rotation sway
-	var lower_chest_track = idle_anim.add_track(Animation.TYPE_VALUE)
-	idle_anim.track_set_path(lower_chest_track, NodePath("Skeleton2D:CenterBone/LowerChest:rotation"))
-	idle_anim.track_set_interpolation_type(lower_chest_track, Animation.INTERPOLATION_CUBIC)
-	idle_anim.track_insert_key(lower_chest_track, 0.0, 0.0)
-	idle_anim.track_insert_key(lower_chest_track, 0.5, -0.04)
-	idle_anim.track_insert_key(lower_chest_track, 1.0, 0.0)
-	idle_anim.track_insert_key(lower_chest_track, 1.5, 0.04)
-	idle_anim.track_insert_key(lower_chest_track, 2.0, 0.0)
-	
-	# Chest rotation sway
-	var chest_track = idle_anim.add_track(Animation.TYPE_VALUE)
-	idle_anim.track_set_path(chest_track, NodePath("Skeleton2D:CenterBone/LowerChest/Chest:rotation"))
-	idle_anim.track_set_interpolation_type(chest_track, Animation.INTERPOLATION_CUBIC)
-	idle_anim.track_insert_key(chest_track, 0.0, 0.0)
-	idle_anim.track_insert_key(chest_track, 0.5, 0.02)
-	idle_anim.track_insert_key(chest_track, 1.0, 0.0)
-	idle_anim.track_insert_key(chest_track, 1.5, -0.02)
-	idle_anim.track_insert_key(chest_track, 2.0, 0.0)
-	
-	# Neck rotation sway
-	var neck_track = idle_anim.add_track(Animation.TYPE_VALUE)
-	idle_anim.track_set_path(neck_track, NodePath("Skeleton2D:CenterBone/LowerChest/Chest/Neck:rotation"))
-	idle_anim.track_set_interpolation_type(neck_track, Animation.INTERPOLATION_CUBIC)
-	idle_anim.track_insert_key(neck_track, 0.0, 0.0)
-	idle_anim.track_insert_key(neck_track, 0.5, 0.03)
-	idle_anim.track_insert_key(neck_track, 1.0, 0.0)
-	idle_anim.track_insert_key(neck_track, 1.5, -0.03)
-	idle_anim.track_insert_key(neck_track, 2.0, 0.0)
-	
-	# Add the animation to the library
-	var anim_library = AnimationLibrary.new()
-	anim_library.add_animation("idle", idle_anim)
-	animation_player.add_animation_library("", anim_library)
-	
-	# Play the idle animation
-	animation_player.play("idle")
 
 func setup_test_environment():
 	# Get viewport size for debugging
