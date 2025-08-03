@@ -50,6 +50,7 @@ var walk_allowed = true
 var hypercharge_allowed = true
 var snap_allowed = true
 var hoop_control_allowed = true
+var hoop_on = true
 
 # Hoop instance
 var hoop_instance: HulaHoop = null
@@ -68,6 +69,10 @@ const HELICOPTER_HOOP_TARGET = "CenterBone/LowerChest/Chest/Neck/Head"
 func _physics_process(delta: float) -> void:
 	var bod = get_node("Body")
 	var pressed = []
+	if not hoop_on and hoop_instance and hoop_instance.visible:
+		hoop_instance.hide()
+	if hoop_on and hoop_instance and not hoop_instance.visible:
+		hoop_instance.show()
 	for action in SKILLS:
 		if action not in locked_skills and Input.is_action_pressed(action):
 			pressed.append(action)
@@ -102,9 +107,10 @@ func ground_control(delta, pressed, direction):
 	air_momentum = Vector2.ZERO
 	refresh_airskills()
 	direct_player(direction, pressed)
-	if hoop_control_allowed: hoop_directing(direction)
-	if hypercharge_allowed and hypercharging(delta, direction, "B0" in pressed):
-		return
+	if hoop_on:
+		if hoop_control_allowed: hoop_directing(direction)
+		if hypercharge_allowed and hypercharging(delta, direction, "B0" in pressed):
+			return
 	if walk_allowed: walk(direction)
 	if "B1" in pressed and jump_allowed:
 		jump(direction)
@@ -112,6 +118,8 @@ func ground_control(delta, pressed, direction):
 	hoop_revving(delta)
 
 func air_control(delta, pressed, direction):
+	if not hoop_on:
+		velocity += get_gravity() * delta
 	if "B3" in pressed and snap_allowed: rubber_snap(direction)
 	#print("snapto")
 	if snap_to(delta): return
@@ -127,7 +135,7 @@ func air_control(delta, pressed, direction):
 
 
 func update_hoop():
-	if hoop_instance:
+	if hoop_on and hoop_instance:
 		hoop_instance.current_phase = rev * TAU
 		var max_snap_scale = 100 / (hoop_instance.hoop_system.hoop.radius * 2)
 		hoop_instance.scale.x = (1 + snap_stretch * max_snap_scale / 2)
@@ -345,7 +353,7 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 	return true
 
 func walk(direction):
-	if true:
+	if hoop_on:
 		walk_jerked(direction)
 		return
 	if direction.x:
@@ -372,11 +380,11 @@ func hoop_revving(delta):
 
 func jump(direction):
 	velocity.y = jump_velocity
-	if Input.is_action_pressed("move_up"):
-		velocity.y -= cos(rev * 2 * PI) * HOOP_SPEED * $Body.transform.x.x
-	air_momentum = velocity
-	air_momentum = get_hoop_force_vector() + Vector2(0, jump_velocity)
-	velocity = air_momentum
+	if hoop_on:
+		air_momentum = get_hoop_force_vector() + Vector2(0, jump_velocity)
+		velocity = air_momentum
+	else:
+		air_momentum = Vector2(0, jump_velocity)
 	jump_processed = false
 	# Play jump sound
 	AudioManager.play_jump_sound()
