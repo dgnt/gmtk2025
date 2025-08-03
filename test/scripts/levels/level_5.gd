@@ -1,9 +1,13 @@
 extends "res://scripts/levels/generic_level.gd"
 
+var background_music: AudioStreamPlayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	super._ready()
+	
+	# Setup background music
+	setup_background_music()
 	var dachshund = find_child("Dachshund", true, false)
 
 	dachshund.hypercharge_allowed = false
@@ -34,3 +38,21 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	pass
+
+
+func setup_background_music():
+	background_music = AudioStreamPlayer.new()
+	background_music.name = "BackgroundMusic"
+	
+	# Load the mysterious dark music
+	var music_stream = load("res://assets/audio/music/mysterious-dark-background-310162.mp3")
+	if music_stream:
+		background_music.stream = music_stream
+		background_music.volume_db = -10.0  # Slightly quieter
+		background_music.autoplay = true
+		background_music.bus = "Music"  # Use music bus if available
+		add_child(background_music)
+		background_music.play()
+		print("Level 5: Background music started")
+	else:
+		print("Level 5: Failed to load background music")

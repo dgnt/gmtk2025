@@ -7,6 +7,12 @@ signal level_failed
 # Physics and control values
 @export var speed = 300.0
 @export var jump_velocity = -900.0
+
+# Head animation values
+@export var head_rotation_max = 0.5  # Maximum rotation in radians (about 28 degrees)
+@export var head_rotation_speed = 10.0  # Speed of head rotation animation
+@export var head_rotation_exponent = 1.5  # Exponent for exponential scaling
+@export var velocity_cap = 400.0  # Maximum velocity to consider for head rotation
 const REV_TIME = 800  # ms
 const HOOP_SPEED = 300
 const STABILITY = 250
@@ -78,6 +84,7 @@ func _physics_process(delta: float) -> void:
 			pressed.append(action)
 	var direction := Input.get_axis("move_left", "move_right")
 	control(delta)
+	animate_head(delta)
 	
 	for i in range(get_slide_collision_count()):
 		var collider = get_slide_collision(i).get_collider()
@@ -102,6 +109,31 @@ func control(delta):
 		air_control(delta, pressed, direction)
 	update_hoop()
 	move_and_slide()
+
+func animate_head(delta: float) -> void:
+	# Get head bone reference
+	var skeleton = $Body/Skeleton2D
+	if not skeleton:
+		return
+	var head_bone = skeleton.get_node("CenterBone/LowerChest/Chest/Neck/Head")
+	if not head_bone:
+		return
+	
+	# Calculate velocity factor (0-1) based on x velocity
+	var velocity_factor = min(abs(velocity.x) / velocity_cap, 1.0)
+	
+	# Apply exponential scaling
+	velocity_factor = pow(velocity_factor, head_rotation_exponent)
+	
+	# Calculate target rotation (opposite of velocity direction)
+	var target_rotation = 0.0
+	if velocity.x != 0:
+		# Negative velocity.x should rotate head positive (to the right)
+		# Positive velocity.x should rotate head negative (to the left)
+		target_rotation = -sign(velocity.x) * velocity_factor * head_rotation_max
+	
+	# Smoothly interpolate to target rotation
+	head_bone.rotation = lerp(head_bone.rotation, target_rotation, head_rotation_speed * delta)
 
 func ground_control(delta, pressed, direction):
 	air_momentum = Vector2.ZERO
