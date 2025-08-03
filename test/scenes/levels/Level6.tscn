@@ -13,6 +13,7 @@
 script = ExtResource("1_jqi6a")
 
 [node name="Parallax2D" type="Parallax2D" parent="."]
+visible = false
 z_index = -4
 scroll_scale = Vector2(0.17, 0)
 scroll_offset = Vector2(0, 544)
@@ -26,6 +27,7 @@ texture = ExtResource("2_t2tbo")
 metadata/_edit_lock_ = true
 
 [node name="Parallax2D2" type="Parallax2D" parent="."]
+visible = false
 scroll_scale = Vector2(0.15, 1)
 repeat_size = Vector2(1400, 0)
 repeat_times = 2
@@ -38,6 +40,7 @@ texture = ExtResource("3_vaxtn")
 offset = Vector2(100, 0)
 
 [node name="Parallax2D5" type="Parallax2D" parent="."]
+visible = false
 scroll_scale = Vector2(0.2, 1)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Parallax2D5"]
