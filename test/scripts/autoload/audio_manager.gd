@@ -162,4 +162,4 @@ func play_jump_sound() -> int:
 
 func play_airburst_sound() -> int:
 	"""Play the airburst sound for rubber snap with pitch variation."""
-	return play_sfx("res://assets/audio/sfx/airburst.wav", 0.1, 0.0)
+	return play_sfx("res://assets/audio/sfx/stretch-rubber-rope-foley-8-209722-clipped.mp3", 0.1, 0.0)
