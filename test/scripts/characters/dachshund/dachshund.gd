@@ -112,7 +112,7 @@ func ground_control(delta, pressed, direction):
 		if hypercharge_allowed and hypercharging(delta, direction, "B0" in pressed):
 			return
 	if walk_allowed: walk(direction)
-	if "B1" in pressed and jump_allowed:
+	if "B1" in pressed and jump_allowed and jump_processed:
 		jump(direction)
 		return
 	hoop_revving(delta)
@@ -144,7 +144,13 @@ func update_hoop():
 func hoop_directing(direction):
 	if hoop_instance and hoop_instance:
 		if direction:
-			hoop_instance.rotation = direction.angle()
+			if direction.x == 0:
+				if $Body.transform.x.x > 0:
+					hoop_instance.rotation = PI/2
+				else:
+					hoop_instance.rotation = -PI/2
+			else:
+				hoop_instance.rotation = direction.angle()
 		else:
 			hoop_instance.rotation = (Vector2(1 if forward else -1,0)).angle()
 		if hoop_instance.rotation > PI/2:
@@ -191,8 +197,6 @@ func snap_to(delta) -> bool:
 			rev = 0 if snap_direction.y < 0 else 0.5
 		else:
 			rev = 0 if snap_direction.y > 0 else 0.5
-	print(rev)
-	print(snap_direction)
 	snapping_time -= delta
 	if snapping_time > 0.5 * SNAP_TIME:
 		#snap_stretch = (SNAP_TIME - snapping_time) / (SNAP_TIME / 2)
