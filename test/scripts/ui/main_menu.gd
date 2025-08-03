@@ -4,7 +4,7 @@ extends Control
 @onready var play_button = $VBoxContainer/PlayButton
 @onready var settings_button = $VBoxContainer/SettingsButton
 @onready var debug_button = $VBoxContainer/DebugButton
-@onready var skeleton = $Skeleton2D
+@onready var skeleton = $Node2D/Skeleton2D
 
 # Hula hoop effect
 var hula_hoop: HulaHoop
@@ -108,7 +108,11 @@ func setup_hula_hoop_effect():
 	hula_hoop.name = "MenuHulaHoop"
 	hula_hoop.visible = false
 	hula_hoop.target_bone_path = "PlayButton"
-	add_child(hula_hoop)
+	# Add hoop to Node2D to match coordinate system with bones
+	$Node2D.add_child(hula_hoop)
+	# Disable the HulaHoopSystem to prevent bone manipulation
+	if hula_hoop.hoop_system:
+		hula_hoop.hoop_system.enabled = false
 
 	
 	# Connect hover signals for mouse users
