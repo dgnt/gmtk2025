@@ -22,6 +22,13 @@ class_name HulaHoop
 @export var color_back: Color = Color(0.556863, 0.121569, 0.141176, 1)  # Dark red
 @export var line_width: float = 25.0
 
+# Light properties
+@export_group("Light")
+@export var light_enabled: bool = false
+@export var light_energy: float = 1.0
+@export var light_color: Color = Color(1, 0.5, 0.3, 1)  # Warm orange glow
+@export var light_scale: float = 2.0
+
 # References
 var skeleton_ref: Skeleton2D
 var target_bone: Bone2D
@@ -31,6 +38,7 @@ var front_line: Line2D
 var back_line: Line2D
 var left_distortion: ColorRect
 var right_distortion: ColorRect
+var hoop_light: PointLight2D
 
 # Internal state
 var current_phase: float = 0.0
@@ -95,9 +103,28 @@ func setup_visual_components():
 	front_line.width = line_width
 	front_line.default_color = color_front
 	visual_node.add_child(front_line)
+	
+	# Create light
+	setup_light()
 		
 	# Update the visual
 	update_hoop_visual()
+
+func setup_light():
+	hoop_light = PointLight2D.new()
+	hoop_light.name = "HoopLight"
+	hoop_light.energy = light_energy
+	hoop_light.color = light_color
+	hoop_light.texture_scale = light_scale
+	hoop_light.visible = light_enabled
+	hoop_light.z_index = 5  # Above the hoop visuals
+	
+	# Let PointLight2D use its default gradient texture
+	# (commenting out custom texture - was showing Godot icon)
+	var light_texture = preload("res://assets/images/City/light_ball_512.png") if ResourceLoader.exists("res://assets/images/City/light_ball_512.png") else null
+	if light_texture:
+		hoop_light.texture = light_texture
+	visual_node.add_child(hoop_light)
 
 func setup_distortion_effects():
 	# Load the air distortion material
@@ -488,3 +515,27 @@ func set_stretch_direction(direction: Vector2):
 	stretch_direction = direction.normalized()
 	if is_stretching and visual_node:
 		visual_node.rotation = stretch_direction.angle()
+
+# Light control methods
+func set_light_enabled(enabled: bool):
+	light_enabled = enabled
+	if hoop_light:
+		hoop_light.visible = enabled
+
+func set_light_energy(energy: float):
+	light_energy = energy
+	if hoop_light:
+		hoop_light.energy = energy
+
+func set_light_color(color: Color):
+	light_color = color
+	if hoop_light:
+		hoop_light.color = color
+
+func set_light_scale(scale: float):
+	light_scale = scale
+	if hoop_light:
+		hoop_light.texture_scale = scale
+
+func set_light_texture_scale(scale: float):
+	set_light_scale(scale)  # Alias for consistency
