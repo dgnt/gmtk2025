@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=4 uid="uid://c4hpalxi6365b"]
+[gd_scene load_steps=8 format=4 uid="uid://c4hpalxi6365b"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_3.gd" id="1_67hmt"]
-[ext_resource type="Texture2D" uid="uid://b2846nt1myo0q" path="res://assets/images/Background_2.png" id="2_xovhh"]
-[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_jjs2l"]
+[ext_resource type="Texture2D" uid="uid://shj1pvxtdqq5" path="res://assets/images/Beach/beach_day_sky.png" id="2_3sfco"]
+[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_jjs2l"]
+[ext_resource type="Texture2D" uid="uid://ujgn56fljtnb" path="res://assets/images/Beach/beach_day_water.png" id="3_l7ncp"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_mq2ia"]
+[ext_resource type="Texture2D" uid="uid://cn2gk3wnu4tym" path="res://assets/images/Beach/beach_day_sand.png" id="4_cmnnt"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_q1d53"]
 
 [node name="Level3" type="Node2D"]
@@ -13,13 +15,30 @@ script = ExtResource("1_67hmt")
 z_index = -1000
 scroll_scale = Vector2(0.17, 0)
 scroll_offset = Vector2(0, 544)
-repeat_size = Vector2(1984, 0)
-repeat_times = 4
 metadata/_edit_lock_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Parallax2D"]
-scale = Vector2(4, 4)
-texture = ExtResource("2_xovhh")
+position = Vector2(1650, 0)
+scale = Vector2(2.2, 2.1)
+texture = ExtResource("2_3sfco")
+metadata/_edit_lock_ = true
+
+[node name="Parallax2D3" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.25, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax2D3"]
+position = Vector2(1600, 800)
+scale = Vector2(2.2, 1)
+texture = ExtResource("3_l7ncp")
+metadata/_edit_lock_ = true
+
+[node name="Parallax2D4" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.3, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax2D4"]
+position = Vector2(1600, 785)
+scale = Vector2(2.2, 1.3)
+texture = ExtResource("4_cmnnt")
 metadata/_edit_lock_ = true
 
 [node name="TileMap" type="TileMap" parent="."]
