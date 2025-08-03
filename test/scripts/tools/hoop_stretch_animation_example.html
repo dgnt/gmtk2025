@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellipse Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        canvas {
+            border: 1px solid #ddd;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: crosshair;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #6b5b95;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #5a4a7a;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+        }
+        
+        .info {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ellipse Animation Demo</h1>
+    
+    <canvas id="canvas" width="800" height="400"></canvas>
+    
+    <div class="controls">
+        <button id="playBtn">Play Animation</button>
+        <button id="resetBtn">Reset</button>
+        <div class="speed-control">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="0.5" max="3" step="0.1" value="1">
+            <span id="speedValue">1.0x</span>
+        </div>
+    </div>
+    
+    <div class="info">
+        <p>Stage: <span id="stageInfo">1</span></p>
+        <p>Click and drag on the canvas to see the ellipse parameters</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const stageInfo = document.getElementById('stageInfo');
+        
+        let animationProgress = 0;
+        let isAnimating = false;
+        let animationSpeed = 1;
+        let mousePos = { x: 0, y: 0 };
+        let showDebug = false;
+        
+        // Animation parameters
+        const stages = {
+            stage1: { a: 60, b: 40, cx: 150, cy: 200 },
+            stage2: { a: 250, b: 25, cx: 400, cy: 200 },
+            stage3: { a: 100, b: 70, cx: 650, cy: 200 }
+        };
+        
+        // Easing function for smooth animation
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+        
+        // Linear interpolation
+        function lerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+        
+        // Get ellipse parameters based on animation progress
+        function getEllipseParams(progress) {
+            const easedProgress = easeInOutCubic(progress);
+            
+            if (progress < 0.5) {
+                // Stage 1 to Stage 2
+                const t = easedProgress * 2;
+                return {
+                    a: lerp(stages.stage1.a, stages.stage2.a, t),
+                    b: lerp(stages.stage1.b, stages.stage2.b, t),
+                    cx: lerp(stages.stage1.cx, stages.stage2.cx, t),
+                    cy: lerp(stages.stage1.cy, stages.stage2.cy, t),
+                    stage: t < 0.5 ? 1 : 2
+                };
+            } else {
+                // Stage 2 to Stage 3
+                const t = (easedProgress - 0.5) * 2;
+                return {
+                    a: lerp(stages.stage2.a, stages.stage3.a, t),
+                    b: lerp(stages.stage2.b, stages.stage3.b, t),
+                    cx: lerp(stages.stage2.cx, stages.stage3.cx, t),
+                    cy: lerp(stages.stage2.cy, stages.stage3.cy, t),
+                    stage: t < 0.5 ? 2 : 3
+                };
+            }
+        }
+        
+        // Draw ellipse
+        function drawEllipse(params, alpha = 1) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.ellipse(params.cx, params.cy, params.a, params.b, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#6b5b95';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.restore();
+        }
+        
+        // Draw stage indicators
+        function drawStageIndicators() {
+            ctx.save();
+            ctx.fillStyle = '#999';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            
+            // Draw ghost ellipses and labels
+            ctx.globalAlpha = 0.2;
+            drawEllipse(stages.stage1, 0.3);
+            drawEllipse(stages.stage2, 0.3);
+            drawEllipse(stages.stage3, 0.3);
+            
+            ctx.globalAlpha = 1;
+            ctx.fillText('1', stages.stage1.cx, stages.stage1.cy);
+            ctx.fillText('2', stages.stage2.cx, stages.stage2.cy);
+            ctx.fillText('3', stages.stage3.cx, stages.stage3.cy);
+            
+            ctx.restore();
+        }
+        
+        // Draw debug info
+        function drawDebugInfo(params) {
+            if (!showDebug) return;
+            
+            ctx.save();
+            ctx.fillStyle = '#666';
+            ctx.font = '12px monospace';
+            ctx.fillText(`Mouse: (${mousePos.x}, ${mousePos.y})`, 10, 20);
+            ctx.fillText(`Center: (${Math.round(params.cx)}, ${Math.round(params.cy)})`, 10, 40);
+            ctx.fillText(`Radii: a=${Math.round(params.a)}, b=${Math.round(params.b)}`, 10, 60);
+            ctx.fillText(`Progress: ${(animationProgress * 100).toFixed(1)}%`, 10, 80);
+            ctx.restore();
+        }
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stage indicators
+            drawStageIndicators();
+            
+            // Get current ellipse parameters
+            const params = getEllipseParams(animationProgress);
+            
+            // Draw the animated ellipse
+            drawEllipse(params);
+            
+            // Draw debug info
+            drawDebugInfo(params);
+            
+            // Update stage info
+            stageInfo.textContent = params.stage;
+            
+            // Update animation progress
+            if (isAnimating) {
+                animationProgress += 0.01 * animationSpeed;
+                if (animationProgress >= 1) {
+                    animationProgress = 1;
+                    isAnimating = false;
+                    playBtn.textContent = 'Play Animation';
+                }
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        // Event listeners
+        playBtn.addEventListener('click', () => {
+            if (isAnimating) {
+                isAnimating = false;
+                playBtn.textContent = 'Play Animation';
+            } else {
+                if (animationProgress >= 1) {
+                    animationProgress = 0;
+                }
+                isAnimating = true;
+                playBtn.textContent = 'Pause';
+                animate();
+            }
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            animationProgress = 0;
+            isAnimating = false;
+            playBtn.textContent = 'Play Animation';
+            animate();
+        });
+        
+        speedSlider.addEventListener('input', (e) => {
+            animationSpeed = parseFloat(e.target.value);
+            speedValue.textContent = animationSpeed.toFixed(1) + 'x';
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = Math.round(e.clientX - rect.left);
+            mousePos.y = Math.round(e.clientY - rect.top);
+            if (!isAnimating) animate();
+        });
+        
+        canvas.addEventListener('click', () => {
+            showDebug = !showDebug;
+            if (!isAnimating) animate();
+        });
+        
+        // Initial draw
+        animate();
+    </script>
+</body>
+</html>

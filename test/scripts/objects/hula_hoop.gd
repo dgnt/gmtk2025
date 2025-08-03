@@ -37,10 +37,34 @@ var current_phase: float = 0.0
 var bone_data: Dictionary = {}
 var all_bones: Array = []
 
+# Stretch animation state
+var is_stretching: bool = false
+var stretch_direction: Vector2 = Vector2.RIGHT
+var stretch_time: float = 0.0
+var stretch_animation_speed: float = 8.0  # How fast the stretch animates
+
+# Snap animation state
+var snap_distance: float = 0.0
+var original_radius: float = 0.0
+var original_position: Vector2 = Vector2.ZERO
+var stretch_duration: float = 0.4  # Duration of the stretch animation
+var original_hoop_width: float = 0.0
+var original_hoop_height: float = 0.0
+
+var dachshund_scale: Vector2 = Vector2.ONE
+
 func _ready():
 	# Don't set up components here since we need skeleton reference
 	# Everything will be set up in initialize()
 	pass
+
+func _enter_tree():
+	# Called when node enters the scene tree
+	# Safe place to get parent references
+	if get_parent():
+		var parent_node = get_parent()
+		if parent_node:
+			dachshund_scale = parent_node.scale
 
 func setup_visual_components():
 	# Prevent duplicate visual nodes
@@ -71,7 +95,7 @@ func setup_visual_components():
 	front_line.width = line_width
 	front_line.default_color = color_front
 	visual_node.add_child(front_line)
-	
+		
 	# Update the visual
 	update_hoop_visual()
 
@@ -226,22 +250,24 @@ func update_hoop_lines():
 	# Create points for front and back halves
 	var half_width = hoop_width / 2.0
 	var half_height = hoop_height / 2.0
-	
+		
 	# Front half (bottom arc)
 	var front_points = []
-	for i in range(5):
-		var t = i / 4.0
-		var x = lerp(-half_width, half_width, t)
-		var y = half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		front_points.append(Vector2(x, y))
+	for i in range(9):  # More points for smoother deformation
+		var t = i / 8.0
+		var base_x = lerp(-half_width, half_width, t)
+		var base_y = half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var point = Vector2(base_x, base_y)	
+		front_points.append(point)
 	
 	# Back half (top arc)
 	var back_points = []
-	for i in range(5):
-		var t = i / 4.0
-		var x = lerp(-half_width, half_width, t)
-		var y = -half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
-		back_points.append(Vector2(x, y))
+	for i in range(9):  # More points for smoother deformation
+		var t = i / 8.0
+		var base_x = lerp(-half_width, half_width, t)
+		var base_y = -half_height * (1.0 - 4.0 * pow(t - 0.5, 2))
+		var point = Vector2(base_x, base_y)		
+		back_points.append(point)
 	
 	front_line.points = front_points
 	back_line.points = back_points
@@ -252,19 +278,33 @@ func update_hoop_lines():
 	front_line.width = line_width
 	back_line.width = line_width
 	
-	# Update distortion effect positions
+	# Update distortion effect positions and strength
 	if left_distortion and right_distortion:
-		# Position distortions at the leftmost and rightmost points
+		# Find the actual leftmost and rightmost points after stretch
 		var left_pos = Vector2(-half_width, 0)
 		var right_pos = Vector2(half_width, 0)
 		
+		if is_stretching:
+			# The distortion positions should match the current hoop width
+			# Since hoop_width is already being lerped in update_stretch_animation
+			left_pos = Vector2(-hoop_width / 2.0, 0)
+			right_pos = Vector2(hoop_width / 2.0, 0)
+		
 		left_distortion.position = left_pos - left_distortion.size / 2.0
 		right_distortion.position = right_pos - right_distortion.size / 2.0
+		
+		# Increase distortion strength when stretching
+		if is_stretching and left_distortion.material and right_distortion.material:
+			# Calculate distortion based on how much we've stretched
+			var stretch_amount = (hoop_width - original_hoop_width) / original_hoop_width if original_hoop_width > 0 else 0.0
+			var distortion_strength = 0.01 + stretch_amount * 0.02
+			left_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
+			right_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
 
 func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
 
-func _process(_delta: float):
+func _process(delta: float):
 	# Phase is controlled by character script
 	if not skeleton_ref or not target_bone:
 		return
@@ -272,14 +312,22 @@ func _process(_delta: float):
 	# Update hoop system phase
 	if hoop_system and hoop_system.hoop:
 		hoop_system.hoop.phase = current_phase
-	
+		
 	# Position hoop at target bone with circular motion
 	if target_bone:
 		var x_offset = cos(current_phase) * (path_width / 2.0)
 		var y_offset = sin(current_phase) * (path_height / 2.0)
-		# No need to rotate offset since visual_node handles rotation
-		global_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
+		var base_position = target_bone.global_position + Vector2(x_offset, y_offset).rotated(rotation)
 		
+		# Update stretch animation
+		if is_stretching:
+			var stretch_offset = update_stretch_animation(delta)
+			base_position += stretch_offset
+		
+		global_position = base_position
+	
+
+
 
 # Public API methods
 func set_path_dimensions(width: float, height: float):
@@ -329,3 +377,114 @@ func set_colors(front: Color, back: Color):
 		front_line.default_color = color_front
 	if back_line:
 		back_line.default_color = color_back
+
+# Stretch animation methods
+func start_stretch(direction: Vector2, duration: float = 0.2, distance: float = 0.0):
+	is_stretching = true
+	stretch_direction = -direction.normalized()
+	stretch_time = 0.0
+	snap_distance = distance
+	stretch_duration = duration
+	
+	# Store original radius
+	if hoop_system and hoop_system.hoop:
+		original_radius = hoop_system.hoop.radius
+	
+	# Store original hoop visual dimensions
+	original_hoop_width = hoop_width
+	original_hoop_height = hoop_height
+	
+	# Don't override the rotation set by hoop_directing
+	# The visual node rotation should be controlled by tilt_angle
+
+func update_stretch_animation(delta: float) -> Vector2:
+	if not is_stretching:
+		return Vector2.ZERO
+	
+	stretch_time += delta
+	
+	# Match the stretch duration phases: first half pause, second half movement
+	var half_time = stretch_duration / 2.0
+	var position_offset = Vector2.ZERO
+
+	var target_width = original_hoop_width + (snap_distance * 1/dachshund_scale.x)
+	var target_height = original_hoop_height * (target_width / original_hoop_width)
+	
+	if stretch_time < half_time:
+		# First phase: stretch out during pause (0 to 0.2s)
+		var progress = stretch_time / half_time
+		var eased_progress = ease(progress, -2.0)  # Ease out for smooth stretch
+		
+		# Lerp dimensions and position during first phase
+		hoop_width = lerp(original_hoop_width, target_width, eased_progress)
+		hoop_height = lerp(original_hoop_height, target_height, eased_progress)
+		
+		# Calculate the position offset (negative because we subtract in _process)
+		position_offset.x = -(snap_distance / 2.0) * eased_progress * stretch_direction.x
+		position_offset.y = -(snap_distance / 2.0) * eased_progress * stretch_direction.y
+	elif stretch_time < half_time * 2:
+		# Second phase: snap back during movement (0.2s to 0.4s)
+		var progress = (stretch_time - half_time) / half_time
+		
+		# Quick snap back with overshoot and bounce
+		var eased_progress: float
+		# var parent_node = get_parent()
+		if progress < 0.5:
+			# Snap back quickly with overshoot
+			eased_progress = ease(progress * 2, 2.0)
+			# Overshoot: go slightly past original size
+			var overshoot_width = original_hoop_width * 0.7
+			var overshoot_height = original_hoop_height * 0.7
+			hoop_width = lerp(target_width, overshoot_width, eased_progress)
+			hoop_height = lerp(target_height, overshoot_height, eased_progress)
+
+		else:
+			# Settle back to normal with bounce
+			var bounce_progress = (progress - 0.5) * 2
+			eased_progress = ease(bounce_progress, -1.5)
+			var overshoot_width = original_hoop_width * 0.7
+			var overshoot_height = original_hoop_height * 0.7
+			hoop_width = lerp(overshoot_width, original_hoop_width, eased_progress)
+			hoop_height = lerp(overshoot_height, original_hoop_height, eased_progress)
+					
+		# Calculate the position offset back
+		position_offset.x = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.x
+		position_offset.y = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.y
+		# parent_node.position += position_offset/2
+	else:
+		# Animation complete
+		end_stretch()
+	
+	# Update visual
+	update_hoop_visual()
+	
+	# Return the calculated offset
+	return position_offset
+
+func end_stretch():
+	is_stretching = false
+	stretch_time = 0.0
+	
+	# Restore original radius
+	if snap_distance > 0 and hoop_system and hoop_system.hoop:
+		hoop_system.hoop.radius = original_radius
+	
+	# Restore original hoop dimensions
+	hoop_width = original_hoop_width
+	hoop_height = original_hoop_height
+	
+	# Reset snap distance
+	snap_distance = 0.0
+	
+	# Reset distortion strength
+	if left_distortion and left_distortion.material:
+		left_distortion.material.set_shader_parameter("distortion_strength", 0.01)
+	if right_distortion and right_distortion.material:
+		right_distortion.material.set_shader_parameter("distortion_strength", 0.01)
+	
+	update_hoop_visual()
+
+func set_stretch_direction(direction: Vector2):
+	stretch_direction = direction.normalized()
+	if is_stretching and visual_node:
+		visual_node.rotation = stretch_direction.angle()

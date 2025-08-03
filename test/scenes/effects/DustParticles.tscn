@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" uid="uid://cw2hlo8gfn3xp" path="res://assets/sprites/effects/dust-particle.png" id="1"]
+[ext_resource type="Script" path="res://scripts/effects/dust_effect.gd" id="2"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(0.8, 0.7, 0.5, 1, 0.7, 0.6, 0.4, 0.8, 0.6, 0.5, 0.3, 0)
+
+[node name="DustParticles" type="CPUParticles2D"]
+emitting = false
+amount = 20
+lifetime = 0.8
+one_shot = true
+speed_scale = 1.5
+texture = ExtResource("1")
+emission_shape = 3
+emission_rect_extents = Vector2(30, 2)
+direction = Vector2(0, -1)
+spread = 45.0
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+angular_velocity_min = -180.0
+angular_velocity_max = 180.0
+gravity = Vector2(0, 500)
+scale_amount_min = 0.5
+scale_amount_max = 1.5
+color_ramp = SubResource("Gradient_1")
+script = ExtResource("2")

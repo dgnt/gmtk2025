@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=4 uid="uid://dqu0a44ykfh40"]
+[gd_scene load_steps=6 format=4 uid="uid://r7uy0xsk0vb6"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_10.gd" id="1_e76jn"]
 [ext_resource type="Texture2D" uid="uid://b2846nt1myo0q" path="res://assets/images/Background_2.png" id="2_5s0y7"]
-[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_0612w"]
+[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_0612w"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_dp13p"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_87qvf"]
 

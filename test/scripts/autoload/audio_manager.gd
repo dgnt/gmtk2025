@@ -162,4 +162,22 @@ func play_jump_sound() -> int:
 
 func play_airburst_sound() -> int:
 	"""Play the airburst sound for rubber snap with pitch variation."""
-	return play_sfx("res://assets/audio/sfx/airburst.wav", 0.1, 0.0)
+	return play_sfx("res://assets/audio/sfx/stretch-rubber-rope-foley-8-209722-clipped.mp3", 0.1, 0.0)
+
+func play_hypercharge_sound() -> int:
+	"""Play the hypercharge charging sound (looping)."""
+	return play_sfx("res://assets/audio/sfx/HoopSound.ogg", 0.0, 0.0)
+
+func update_hypercharge_sound(track_id: int, charge_percent: float) -> void:
+	"""Update hypercharge sound pitch and volume based on charge level.
+	charge_percent should be between 0.0 and 1.0"""
+	if track_id in active_sounds:
+		var player = active_sounds[track_id]
+		# Scale pitch from 1.0 to 1.8 based on charge
+		player.pitch_scale = 1.0 + (charge_percent * 0.8)
+		# Scale volume from 0.0 to 6.0 dB based on charge
+		player.volume_db = charge_percent * 6.0
+
+func stop_hypercharge_sound(track_id: int) -> void:
+	"""Stop the hypercharge sound."""
+	stop_sfx(track_id)

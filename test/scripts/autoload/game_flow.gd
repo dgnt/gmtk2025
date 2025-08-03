@@ -14,8 +14,6 @@ extends Node
 	"res://scenes/levels/Level9.tscn", # Your Level 9 scene
 	"res://scenes/levels/Level10.tscn", # Your Level 10 scene
 	# Add more level paths here as you create them
-	"res://scenes/levels/Level11.tscn",
-
 ]
 
 # Path to your game completion scene
