@@ -142,7 +142,7 @@ func display_overlay_text_message(message: String, time: float = 5.0, font_size:
 	text_label.add_theme_color_override("font_color", color)
 	text_label.add_theme_font_size_override("font_size", font_size)
 	ui_container.add_child(text_label)
-	text_label.global_position = Vector2(get_viewport().size) / 2 - text_label.size / 2 + Vector2(0, -200)
+	text_label.global_position = Constants.GAMESIZE / 2 - text_label.size / 2 + Vector2(0, -200)
 	var timer = Timer.new()
 	timer.one_shot = true
 	timer.wait_time = time
