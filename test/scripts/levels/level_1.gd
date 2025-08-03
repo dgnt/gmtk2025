@@ -8,6 +8,7 @@ func _ready() -> void:
 	$Dachshund.helicopter_allowed = false
 	$Dachshund.snap_allowed = false
 	$Dachshund.hoop_control_allowed = false
+	$Dachshund.hoop_on = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
