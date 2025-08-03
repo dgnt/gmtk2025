@@ -1,16 +1,16 @@
 [gd_scene load_steps=9 format=4 uid="uid://dftcijaep6rpd"]
 
-[ext_resource type="Script" path="res://scripts/levels/level_6.gd" id="1_lmx4u"]
+[ext_resource type="Script" path="res://scripts/levels/level_4.gd" id="1_4khvg"]
 [ext_resource type="Texture2D" uid="uid://chqhppffncsd5" path="res://assets/images/best_beach.png" id="2_f32tv"]
 [ext_resource type="Texture2D" uid="uid://crlkax26paeqk" path="res://assets/images/buildings_no_bg.png" id="3_1d3fp"]
-[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_p602x"]
+[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_p602x"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="4_gtl0n"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_mwb0y"]
 [ext_resource type="Texture2D" uid="uid://ckvsooi6u7ll0" path="res://assets/images/sand_only.png" id="5_c5upl"]
 [ext_resource type="TileSet" uid="uid://ci18hexa7sxow" path="res://assets/textures/beach_stuff.tres" id="6_3e8e2"]
 
 [node name="Level" type="Node2D"]
-script = ExtResource("1_lmx4u")
+script = ExtResource("1_4khvg")
 
 [node name="Parallax2D" type="Parallax2D" parent="."]
 z_index = -4
