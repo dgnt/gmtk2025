@@ -30,8 +30,8 @@ var snap_direction = Vector2(0, -1)
 const SNAP_TIME = .4
 const SNAP_DISTANCE = 100
 var snapping_time = 0
-var snap_stretch = 0 # 0-1
-var SNAP_STRETCH_SIZE = 1.5
+#var snap_stretch = 0 # 0-1
+#var SNAP_STRETCH_SIZE = 1.5
 var locked_skills = []
 const SKILLS = ["jump", "move_left", "move_right", "move_up", "move_down", "B0", "B1", "B2", "B3"]
 var jump_processed = true
@@ -137,7 +137,7 @@ func air_control(delta, pressed, direction):
 func update_hoop():
 	if hoop_on and hoop_instance:
 		hoop_instance.current_phase = rev * TAU
-		var max_snap_scale = 100 / (hoop_instance.hoop_system.hoop.radius * 2)
+		#var max_snap_scale = 100 / (hoop_instance.hoop_system.hoop.radius * 2)
 		#hoop_instance.scale.x = (1 + snap_stretch * max_snap_scale / 2)
 		#hoop_instance.position.x = (snap_stretch * max_snap_scale)
 
@@ -159,15 +159,15 @@ func rubber_snap(direction):
 	snap_target = position + direction * SNAP_DISTANCE
 	snap_direction = direction
 	hoop_directing(direction)
-	if direction.x < 0:
-		rev = 0.5
-	elif direction.x > 0:
-		rev = 0
-	else:
-		if ($Body.transform.x.x > 0):
-			rev = 0.5 if direction.y < 0 else 0
-		else:
-			rev = 0.5 if direction.y > 0 else 0
+	#if direction.x < 0:
+		#rev = 0.5
+	#elif direction.x > 0:
+		#rev = 0
+	#else:
+		#if ($Body.transform.x.x > 0):
+			#rev = 0 if direction.y < 0 else 0.5
+		#else:
+			#rev = 0 if direction.y > 0 else 0.5
 	air_momentum = Vector2.ZERO
 	velocity = air_momentum
 	clear_fall_type("airsnap")
@@ -184,17 +184,25 @@ func snap_to(delta) -> bool:
 		return false
 	if snap_direction.x < 0:
 		rev = 0.5
-	else:
+	elif snap_direction.x > 0:
 		rev = 0
+	else:
+		if ($Body.transform.x.x > 0):
+			rev = 0 if snap_direction.y < 0 else 0.5
+		else:
+			rev = 0 if snap_direction.y > 0 else 0.5
+	print(rev)
+	print(snap_direction)
 	snapping_time -= delta
 	if snapping_time > 0.5 * SNAP_TIME:
-		snap_stretch = (SNAP_TIME - snapping_time) / (SNAP_TIME / 2)
+		#snap_stretch = (SNAP_TIME - snapping_time) / (SNAP_TIME / 2)
 		return true
 	else:
-		snap_stretch = snapping_time / (SNAP_TIME / 2)
+		#snap_stretch = snapping_time / (SNAP_TIME / 2)
+		pass
 	if snapping_time < 0:
 		snapping_time = 0
-		snap_stretch = 0
+		#snap_stretch = 0
 		air_momentum = snap_direction * SNAP_DISTANCE / SNAP_TIME * 2
 		position = snap_target
 		return false
@@ -282,7 +290,7 @@ func clear_fall_type(except):
 	if except != "airsnap" and snapping_time < SNAP_TIME:
 		snapping_time = 0
 		snap_target = null
-		snap_stretch = 0
+		#snap_stretch = 0
 	if except != "hypercharge":
 		hypercharge = 0
 		# Stop hypercharge sound if clearing hypercharge
@@ -293,7 +301,7 @@ func clear_fall_type(except):
 func refresh_airskills():
 	air_snaps = 1
 	heli_charges = 1
-	snap_stretch = 0
+	#snap_stretch = 0
 	
 func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of control
 	velocity.x = 0
