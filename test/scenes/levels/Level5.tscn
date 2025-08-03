@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/levels/level_5.gd" id="1_cy7tc"]
 [ext_resource type="Texture2D" uid="uid://b2846nt1myo0q" path="res://assets/images/Background_2.png" id="2_xovhh"]
-[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_jjs2l"]
+[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_jjs2l"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_mq2ia"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_q1d53"]
 
