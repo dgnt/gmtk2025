@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bd41upmm7ogyb"
-path="res://.godot/imported/light_ball_512.png-c7c6dfca6cb404aac880a4ea0ab1bb3c.ctex"
+uid="uid://4gqulkxr14uh"
+path="res://.godot/imported/light-medium.png-350fe62e7435a028d7a5bacc4ec73544.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/City/light_ball_512.png"
-dest_files=["res://.godot/imported/light_ball_512.png-c7c6dfca6cb404aac880a4ea0ab1bb3c.ctex"]
+source_file="res://assets/images/City/light-medium.png"
+dest_files=["res://.godot/imported/light-medium.png-350fe62e7435a028d7a5bacc4ec73544.ctex"]
 
 [params]
 

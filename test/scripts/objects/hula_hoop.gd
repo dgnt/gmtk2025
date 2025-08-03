@@ -121,7 +121,7 @@ func setup_light():
 	
 	# Let PointLight2D use its default gradient texture
 	# (commenting out custom texture - was showing Godot icon)
-	var light_texture = preload("res://assets/images/City/light_ball_512.png") if ResourceLoader.exists("res://assets/images/City/light_ball_512.png") else null
+	var light_texture = preload("res://assets/images/City/light-big.png") if ResourceLoader.exists("res://assets/images/City/light-big.png") else null
 	if light_texture:
 		hoop_light.texture = light_texture
 	visual_node.add_child(hoop_light)

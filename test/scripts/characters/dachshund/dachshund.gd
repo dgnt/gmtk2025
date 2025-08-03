@@ -191,8 +191,8 @@ func snap_to(delta) -> bool:
 			rev = 0 if snap_direction.y < 0 else 0.5
 		else:
 			rev = 0 if snap_direction.y > 0 else 0.5
-	print(rev)
-	print(snap_direction)
+	#print(rev)
+	#print(snap_direction)
 	snapping_time -= delta
 	if snapping_time > 0.5 * SNAP_TIME:
 		#snap_stretch = (SNAP_TIME - snapping_time) / (SNAP_TIME / 2)
