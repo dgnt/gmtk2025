@@ -30,6 +30,8 @@ var snap_direction = Vector2(0, -1)
 const SNAP_TIME = .4
 const SNAP_DISTANCE = 100
 var snapping_time = 0
+var snap_stretch = 0 # 0-1
+var SNAP_STRETCH_SIZE = 1.5
 var locked_skills = []
 const SKILLS = ["jump", "move_left", "move_right", "move_up", "move_down", "B0", "B1", "B2", "B3"]
 var jump_processed = true
@@ -40,6 +42,13 @@ var helicopter_sound_id: int = -1
 var airburst_sound_id: int = -1
 const HELI_TRANSPOSE = Vector2(0, -360)
 const HELI_REV_TIME = 0.15 # s
+
+var helicopter_allowed = true
+var jump_allowed = true
+var walk_allowed = true
+var hypercharge_allowed = true
+var snap_allowed = true
+var hoop_control_allowed = true
 
 # Hoop instance
 var hoop_instance: HulaHoop = null
@@ -92,20 +101,20 @@ func ground_control(delta, pressed, direction):
 	air_momentum = Vector2.ZERO
 	refresh_airskills()
 	direct_player(direction, pressed)
-	hoop_directing(direction)
-	if hypercharging(delta, direction, "B0" in pressed):
+	if hoop_control_allowed: hoop_directing(direction)
+	if hypercharge_allowed and hypercharging(delta, direction, "B0" in pressed):
 		return
-	walk(direction)
-	if "B1" in pressed:
+	if walk_allowed: walk(direction)
+	if "B1" in pressed and jump_allowed:
 		jump(direction)
 		return
 	hoop_revving(delta)
 
 func air_control(delta, pressed, direction):
-	if "B3" in pressed: rubber_snap(direction)
+	if "B3" in pressed and snap_allowed: rubber_snap(direction)
 	#print("snapto")
 	if snap_to(delta): return
-	if "B1" in pressed and jump_processed: helicopter(direction)
+	if "B1" in pressed and jump_processed and helicopter_allowed: helicopter(direction)
 	#print("helifall")
 	if helicopter_fall(delta, pressed, direction): return
 	#print("hyper")
@@ -115,9 +124,13 @@ func air_control(delta, pressed, direction):
 	velocity = air_momentum
 	velocity.x += direction.x * speed
 
+
 func update_hoop():
 	if hoop_instance:
 		hoop_instance.current_phase = rev * TAU
+		var max_snap_scale = 100 / (hoop_instance.hoop_system.hoop.radius * 2)
+		hoop_instance.scale.x = (1 + snap_stretch * max_snap_scale / 2)
+		hoop_instance.position.x = (snap_stretch * max_snap_scale)
 
 func hoop_directing(direction):
 	if hoop_instance and hoop_instance:
@@ -139,12 +152,16 @@ func rubber_snap(direction):
 	hoop_directing(direction)
 	if direction.x < 0:
 		rev = 0.5
-	else:
+	elif direction.x > 0:
 		rev = 0
+	else:
+		if ($Body.transform.x.x > 0):
+			rev = 0.5 if direction.y < 0 else 0
+		else:
+			rev = 0.5 if direction.y > 0 else 0
 	air_momentum = Vector2.ZERO
 	velocity = air_momentum
 	clear_fall_type("airsnap")
-	update_hoop()
 	# Play airburst sound effect
 	AudioManager.play_airburst_sound()
 
@@ -157,9 +174,13 @@ func snap_to(delta) -> bool:
 		rev = 0
 	snapping_time -= delta
 	if snapping_time > 0.5 * SNAP_TIME:
+		snap_stretch = (SNAP_TIME - snapping_time) / (SNAP_TIME / 2)
 		return true
+	else:
+		snap_stretch = snapping_time / (SNAP_TIME / 2)
 	if snapping_time < 0:
 		snapping_time = 0
+		snap_stretch = 0
 		air_momentum = snap_direction * SNAP_DISTANCE / SNAP_TIME * 2
 		position = snap_target
 		return false
@@ -247,12 +268,14 @@ func clear_fall_type(except):
 	if except != "airsnap" and snapping_time < SNAP_TIME:
 		snapping_time = 0
 		snap_target = null
+		snap_stretch = 0
 	if except != "hypercharge":
 		hypercharge = 0
 
 func refresh_airskills():
 	air_snaps = 1
 	heli_charges = 1
+	snap_stretch = 0
 	
 func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of control
 	velocity.x = 0
@@ -266,6 +289,8 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 			if ($Body.transform.x.x > 0 and rev < old_rev):
 				rev = 0
 				hyperdirection = direction.normalized()
+				if hyperdirection.x == 0 and hyperdirection.y < 0:
+					rev = 0.5
 				air_momentum = hyperdirection * CHARGE_SPEED
 				velocity = air_momentum
 				#hypercharge = 0

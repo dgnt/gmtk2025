@@ -1,9 +1,9 @@
-[gd_scene load_steps=9 format=4 uid="uid://b7ghv3hjq4ga4"]
+[gd_scene load_steps=9 format=4 uid="uid://bwlxhe1qnmbtv"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_2.gd" id="1_t7s5v"]
 [ext_resource type="Texture2D" uid="uid://bo67gj1iy7p73" path="res://assets/images/clear_sky.png" id="2_b7tuk"]
 [ext_resource type="Texture2D" uid="uid://crlkax26paeqk" path="res://assets/images/buildings_no_bg.png" id="3_2g23l"]
-[ext_resource type="PackedScene" path="res://scenes/objects/WinZone.tscn" id="3_5thkd"]
+[ext_resource type="PackedScene" uid="uid://duyxwsruqs545" path="res://scenes/objects/WinZone.tscn" id="3_5thkd"]
 [ext_resource type="TileSet" uid="uid://bj4xlauomuf1j" path="res://assets/textures/Tiles.tres" id="3_ak8h2"]
 [ext_resource type="PackedScene" uid="uid://cpm1imy0vcjij" path="res://scenes/characters/Dachshund.tscn" id="4_hh1ue"]
 [ext_resource type="Texture2D" uid="uid://u5wn0c10qtsh" path="res://assets/images/tree_line_no_bg.png" id="4_x46hw"]
