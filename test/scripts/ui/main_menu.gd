@@ -104,12 +104,11 @@ func _exit_tree():
 
 func setup_hula_hoop_effect():
 	# Create hula hoop using the factory
-	hula_hoop = HulaHoopFactory.create_basic_hoop(skeleton)
+	hula_hoop = HulaHoopFactory.create_menu_hoop(skeleton)
 	hula_hoop.name = "MenuHulaHoop"
-	hula_hoop.visible = false # this doesn't seem to set the visibility to false
-	#hula_hoop.target_bone_path = "PlayButton"
+	hula_hoop.visible = false
+	hula_hoop.target_bone_path = "PlayButton"
 	add_child(hula_hoop)
-	hula_hoop.visible = false # this doesn't seem to set the visibility to false either
 
 	
 	# Connect hover signals for mouse users
