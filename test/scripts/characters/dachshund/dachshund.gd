@@ -38,6 +38,7 @@ var heli_processed = true
 var helicoptering = false
 var helicopter_sound_id: int = -1
 var airburst_sound_id: int = -1
+var hypercharge_sound_id: int = -1
 const HELI_TRANSPOSE = Vector2(0, -360)
 const HELI_REV_TIME = 0.15 # s
 
@@ -254,6 +255,10 @@ func clear_fall_type(except):
 		snap_target = null
 	if except != "hypercharge":
 		hypercharge = 0
+		# Stop hypercharge sound if clearing hypercharge
+		if hypercharge_sound_id != -1:
+			AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+			hypercharge_sound_id = -1
 
 func refresh_airskills():
 	air_snaps = 1
@@ -263,7 +268,13 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 	velocity.x = 0
 	if charging:
 		charge_processed = false
+		# Start hypercharge sound if not already playing
+		if hypercharge_sound_id == -1:
+			hypercharge_sound_id = AudioManager.play_hypercharge_sound()
 		hypercharge += delta
+		# Update sound based on charge level
+		var charge_percent = min(hypercharge / CHARGE_TIME, 1.0)
+		AudioManager.update_hypercharge_sound(hypercharge_sound_id, charge_percent)
 		var old_rev = rev
 		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
@@ -273,6 +284,10 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 				hyperdirection = direction.normalized()
 				air_momentum = hyperdirection * CHARGE_SPEED
 				velocity = air_momentum
+				# Stop hypercharge sound when launching
+				if hypercharge_sound_id != -1:
+					AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+					hypercharge_sound_id = -1
 				#hypercharge = 0
 				return false
 			elif ($Body.transform.x.x < 0 and old_rev < 0.5 and rev > 0.5):
@@ -280,6 +295,10 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 				hyperdirection = direction.normalized()
 				air_momentum = hyperdirection * CHARGE_SPEED
 				velocity = air_momentum
+				# Stop hypercharge sound when launching
+				if hypercharge_sound_id != -1:
+					AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+					hypercharge_sound_id = -1
 				#hypercharge = 0
 				return false
 				# TODO: Punish hypercharging into the ground
@@ -290,6 +309,10 @@ func hypercharging(delta, direction, charging) -> bool: # retval is pass rest of
 		hypercharge -= delta * 1000.0
 		if hypercharge <= 0:
 			hypercharge = 0
+			# Stop hypercharge sound when charge is released
+			if hypercharge_sound_id != -1:
+				AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+				hypercharge_sound_id = -1
 			return false
 		rev += delta * 1000.0 / REV_TIME * (1+hypercharge/CHARGE_TIME*FULL_CHARGE)
 		rev -= int(rev)
@@ -413,6 +436,10 @@ func die() -> void:
 	if helicopter_sound_id != -1:
 		AudioManager.stop_helicopter_sound(helicopter_sound_id)
 		helicopter_sound_id = -1
+	# Stop hypercharge sound if playing
+	if hypercharge_sound_id != -1:
+		AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+		hypercharge_sound_id = -1
 	level_failed.emit()
 	set_deferred("monitoring", false) # Disable monitoring after first trigger
 	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED) # Disable script processing

@@ -428,6 +428,7 @@ func update_stretch_animation(delta: float) -> Vector2:
 		
 		# Quick snap back with overshoot and bounce
 		var eased_progress: float
+		# var parent_node = get_parent()
 		if progress < 0.5:
 			# Snap back quickly with overshoot
 			eased_progress = ease(progress * 2, 2.0)
@@ -436,6 +437,7 @@ func update_stretch_animation(delta: float) -> Vector2:
 			var overshoot_height = original_hoop_height * 0.7
 			hoop_width = lerp(target_width, overshoot_width, eased_progress)
 			hoop_height = lerp(target_height, overshoot_height, eased_progress)
+
 		else:
 			# Settle back to normal with bounce
 			var bounce_progress = (progress - 0.5) * 2
@@ -444,10 +446,11 @@ func update_stretch_animation(delta: float) -> Vector2:
 			var overshoot_height = original_hoop_height * 0.7
 			hoop_width = lerp(overshoot_width, original_hoop_width, eased_progress)
 			hoop_height = lerp(overshoot_height, original_hoop_height, eased_progress)
-		
+					
 		# Calculate the position offset back
 		position_offset.x = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.x
 		position_offset.y = -(snap_distance / 2.0) * (1.0 - progress) * stretch_direction.y
+		# parent_node.position += position_offset/2
 	else:
 		# Animation complete
 		end_stretch()
