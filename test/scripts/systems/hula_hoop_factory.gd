@@ -58,6 +58,17 @@ static func create_basic_hoop(skeleton: Skeleton2D) -> HulaHoop:
 		"color_back": Color.DARK_RED,
 		"target_bone_path": ""  # No target bone for menu
 	})
+	
+static func create_menu_hoop(skeleton: Skeleton2D) -> HulaHoop:
+	return create_hoop(skeleton, {
+		"path_width": 60.0,
+		"path_height": 6.0,
+		"hoop_width": 600.0,
+		"hoop_height": 60.0,
+		"speed_multiplier": 1.0,
+		"color_front": Color.RED,
+		"color_back": Color.DARK_RED,
+	})
 
 static func create_large_hoop(skeleton: Skeleton2D) -> HulaHoop:
 	return create_hoop(skeleton, {

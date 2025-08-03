@@ -78,7 +78,7 @@ func setup_focus_navigation():
 func _process(delta: float) -> void:
 	if hula_hoop and hula_hoop.visible:
 		# Update hoop rotation phase
-		hoop_phase += delta * 8 * hula_hoop.get_speed_multiplier()
+		hoop_phase += delta * (1.0 / 0.15) * hula_hoop.get_speed_multiplier()
 		if hoop_phase > TAU:
 			hoop_phase -= TAU
 		hula_hoop.current_phase = hoop_phase
@@ -104,10 +104,12 @@ func _exit_tree():
 
 func setup_hula_hoop_effect():
 	# Create hula hoop using the factory
-	hula_hoop = HulaHoopFactory.create_basic_hoop(skeleton)
+	hula_hoop = HulaHoopFactory.create_menu_hoop(skeleton)
 	hula_hoop.name = "MenuHulaHoop"
 	hula_hoop.visible = false
+	hula_hoop.target_bone_path = "PlayButton"
 	add_child(hula_hoop)
+
 	
 	# Connect hover signals for mouse users
 	play_button.mouse_entered.connect(_on_button_hover.bind(play_button, "PlayBone"))
