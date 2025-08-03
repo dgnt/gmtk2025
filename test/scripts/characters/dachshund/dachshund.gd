@@ -138,8 +138,8 @@ func update_hoop():
 	if hoop_on and hoop_instance:
 		hoop_instance.current_phase = rev * TAU
 		var max_snap_scale = 100 / (hoop_instance.hoop_system.hoop.radius * 2)
-		hoop_instance.scale.x = (1 + snap_stretch * max_snap_scale / 2)
-		hoop_instance.position.x = (snap_stretch * max_snap_scale)
+		#hoop_instance.scale.x = (1 + snap_stretch * max_snap_scale / 2)
+		#hoop_instance.position.x = (snap_stretch * max_snap_scale)
 
 func hoop_directing(direction):
 	if hoop_instance and hoop_instance:
