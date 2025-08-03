@@ -464,6 +464,20 @@ func sanify_pack(v2a: PackedVector2Array) -> void:
 func _process(delta: float) -> void:
 	pass
 
+func _exit_tree() -> void:
+	# Stop helicopter sound if playing
+	if helicopter_sound_id != -1:
+		AudioManager.stop_helicopter_sound(helicopter_sound_id)
+		helicopter_sound_id = -1
+	# Stop hypercharge sound if playing
+	if hypercharge_sound_id != -1:
+		AudioManager.stop_hypercharge_sound(hypercharge_sound_id)
+		hypercharge_sound_id = -1
+	# Stop airburst sound if playing
+	if airburst_sound_id != -1:
+		AudioManager.stop_sfx(airburst_sound_id)
+		airburst_sound_id = -1
+
 func die() -> void:
 	# Stop helicopter sound if playing
 	if helicopter_sound_id != -1:
