@@ -14,25 +14,65 @@ var hoop_phase: float = 0.0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# --- Debug Button Visibility/Availability ---
-	# This flag checks if the game is running inside the Godot editor.
-	# When exported, Engine.is_editor_hint() will be false.
-	# OS.is_debug_build() is true for debug exports, false for release exports.
-	# Choose the one that best fits your "local testing/dev" definition.
-	# For simplicity, Engine.is_editor_hint() is often good for "dev only" features.
-	if OS.is_debug_build(): # This works for both editor AND local debug builds
-		debug_button.show() # Make the debug button visible
-		debug_button.set_process_mode(Node.PROCESS_MODE_INHERIT) # Ensure it's active
+	if OS.is_debug_build():
+		debug_button.show()
+		debug_button.set_process_mode(Node.PROCESS_MODE_INHERIT)
 		print("Debug button visible for editor build.")
 	else:
-		debug_button.hide() # Hide the debug button in exported builds
-		debug_button.set_process_mode(Node.PROCESS_MODE_DISABLED) # Disable its processing
+		debug_button.hide()
+		debug_button.set_process_mode(Node.PROCESS_MODE_DISABLED)
 		print("Debug button hidden for exported build.")
 	
-	# Set up hula hoop effect
+	# Set up hula hoop effect FIRST
 	setup_hula_hoop_effect()
+	
+	# Set up controller/keyboard navigation AFTER hula hoop is ready
+	setup_focus_navigation()
+	
+	# Show hoop for initially focused button
+	_on_button_focus_entered(play_button, "PlayBone")
 	
 	# Start menu music
 	AudioManager.play_music("res://assets/audio/music/HoopDogMenu.ogg", -6.0, 0.5)
+
+func setup_focus_navigation():
+	# Ensure all buttons can receive focus
+	play_button.focus_mode = Control.FOCUS_ALL
+	settings_button.focus_mode = Control.FOCUS_ALL
+	
+	if debug_button.visible:
+		debug_button.focus_mode = Control.FOCUS_ALL
+		
+		# Set up focus neighbors manually for reliable navigation
+		play_button.focus_neighbor_top = play_button.get_path()  # Wrap to self at top
+		play_button.focus_neighbor_bottom = settings_button.get_path()
+		
+		settings_button.focus_neighbor_top = play_button.get_path()
+		settings_button.focus_neighbor_bottom = debug_button.get_path()
+		
+		debug_button.focus_neighbor_top = settings_button.get_path()
+		debug_button.focus_neighbor_bottom = debug_button.get_path()  # Wrap to self at bottom
+	else:
+		# Only two buttons when debug is hidden
+		play_button.focus_neighbor_top = play_button.get_path()
+		play_button.focus_neighbor_bottom = settings_button.get_path()
+		
+		settings_button.focus_neighbor_top = play_button.get_path()
+		settings_button.focus_neighbor_bottom = settings_button.get_path()
+	
+	# Set initial focus to play button
+	play_button.grab_focus()
+	
+	# Connect focus signals to integrate with hula hoop effect
+	play_button.focus_entered.connect(_on_button_focus_entered.bind(play_button, "PlayBone"))
+	play_button.focus_exited.connect(_on_button_focus_exited.bind(play_button))
+	
+	settings_button.focus_entered.connect(_on_button_focus_entered.bind(settings_button, "SettingsBone"))
+	settings_button.focus_exited.connect(_on_button_focus_exited.bind(settings_button))
+	
+	if debug_button.visible:
+		debug_button.focus_entered.connect(_on_button_focus_entered.bind(debug_button, "DebugBone"))
+		debug_button.focus_exited.connect(_on_button_focus_exited.bind(debug_button))
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -43,55 +83,33 @@ func _process(delta: float) -> void:
 			hoop_phase -= TAU
 		hula_hoop.current_phase = hoop_phase
 
-#func _on_play_button_pressed():
-#	print("Play button pressed! Loading Level 1...")
-#	get_tree().change_scene_to_file(LEVEL_1_SCENE_PATH)
-	
 func _on_play_button_pressed():
 	print("Play button pressed! Starting game flow...")
 	# Stop menu music before transitioning
 	AudioManager.stop_music(0.3)
 	# Tell the global GameFlow singleton to load the first level
-	GameFlow.start_new_game() # Load the level at index 0 (Level1.tscn)
+	GameFlow.start_new_game()
 
 func _on_settings_button_pressed():
 	print("Settings button pressed! (Implement settings menu here)")
-	# You would typically load a settings scene here:
-	# get_tree().change_scene_to_file("res://Scenes/UI/SettingsMenu.tscn")
 
 func _on_debug_button_pressed():
-	print("Debug button pressed! (Implement debug options here)")
-	# Example: Toggle a debug overlay, print game state, etc.
-	# This code will only run if the button is visible/active.
-	# Load the debug menu scene as an overlay
+	print("Debug button pressed! Loading debug menu...")
 	var debug_menu_scene = preload("res://scenes/ui/DebugMenu.tscn")
 	var debug_menu_instance = debug_menu_scene.instantiate()
-	
-	# Add it as a child of the current scene (overlay)
 	get_tree().current_scene.add_child(debug_menu_instance)
-	
-	# Optional: Pause the main menu or dim the background
-	# get_tree().paused = true
-	# modulate = Color(0.5, 0.5, 0.5, 1.0)  # Dim the main menu
 
 func _exit_tree():
-	# Stop music when leaving the main menu
 	AudioManager.stop_music(0.2)
 
 func setup_hula_hoop_effect():
 	# Create hula hoop using the factory
 	hula_hoop = HulaHoopFactory.create_basic_hoop(skeleton)
 	hula_hoop.name = "MenuHulaHoop"
-	
-	# Customize for menu use
-	#hula_hoop.set_path_dimensions(50.0, 30.0)  # Smaller path for menu buttons
-	#hula_hoop.set_hoop_dimensions(100.0, 60.0)  # Visual hoop size
-	#hula_hoop.line_width = 12.0
 	hula_hoop.visible = false
-	
 	add_child(hula_hoop)
 	
-	# Connect hover signals for all buttons
+	# Connect hover signals for mouse users
 	play_button.mouse_entered.connect(_on_button_hover.bind(play_button, "PlayBone"))
 	play_button.mouse_exited.connect(_on_button_unhover.bind(play_button))
 	
@@ -102,21 +120,32 @@ func setup_hula_hoop_effect():
 		debug_button.mouse_entered.connect(_on_button_hover.bind(debug_button, "DebugBone"))
 		debug_button.mouse_exited.connect(_on_button_unhover.bind(debug_button))
 
+# Mouse hover handlers (existing)
 func _on_button_hover(button: Button, bone_name: String):
 	current_hovered_button = button
-	
-	# Update the hoop's target bone
 	hula_hoop.set_target_bone(bone_name)
 	hula_hoop.visible = true
 
 func _on_button_unhover(button: Button):
-	# Only hide if this is the currently hovered button
 	if current_hovered_button == button:
 		current_hovered_button = null
-		
-		# Small delay to allow for button-to-button transitions
 		await get_tree().create_timer(0.1).timeout
-		
-		# Hide only if no button is hovered
+		if current_hovered_button == null:
+			hula_hoop.visible = false
+
+# Focus handlers for controller/keyboard navigation
+func _on_button_focus_entered(button: Button, bone_name: String):
+	# Show hula hoop when button gets focus via keyboard/controller
+	if current_hovered_button == null:  # Only if not already shown by mouse
+		current_hovered_button = button
+		hula_hoop.set_target_bone(bone_name)
+		hula_hoop.visible = true
+
+func _on_button_focus_exited(button: Button):
+	# Hide hula hoop when button loses focus (if it was the focused one)
+	if current_hovered_button == button:
+		current_hovered_button = null
+		# Small delay to handle focus transitions
+		await get_tree().create_timer(0.05).timeout
 		if current_hovered_button == null:
 			hula_hoop.visible = false
