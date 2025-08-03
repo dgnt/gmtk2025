@@ -30,8 +30,13 @@ func _ready():
 
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		# Level restart shortcut - works in both debug and release builds
-		if event.keycode == KEY_R and event.shift_pressed:
+		# Level restart shortcut - R key alone (works in both debug and release builds)
+		if event.keycode == KEY_R:
+			print("R pressed - restarting current level!")
+			GameFlow.restart_current_level()
+		
+		# Keep the existing Shift+R shortcut as alternative
+		elif event.keycode == KEY_R and event.shift_pressed:
 			print("Shift+R pressed - restarting current level!")
 			GameFlow.restart_current_level()
 		

@@ -14,7 +14,7 @@ func _ready():
 func create_overlay_ui():
 	# Create CanvasLayer for overlay UI - this stays on top of everything
 	overlay_canvas = CanvasLayer.new()
-	overlay_canvas.layer = 100  # High layer value to stay on top
+	overlay_canvas.layer = 10000  # High layer value to stay on top
 	overlay_canvas.name = "UIOverlay"
 	
 	# Create a Control container for organizing UI elements
@@ -135,3 +135,20 @@ func add_overlay_element(element: Control):
 func remove_overlay_element(element: Control):
 	if ui_container and element.get_parent() == ui_container:
 		ui_container.remove_child(element)
+
+func display_overlay_text_message(message: String, time: float = 5.0, font_size: int = 80, color: Color = Color(1,1,1,0.7)):
+	var text_label = Label.new()
+	text_label.text = message
+	text_label.add_theme_color_override("font_color", color)
+	text_label.add_theme_font_size_override("font_size", font_size)
+	ui_container.add_child(text_label)
+	text_label.global_position = Vector2(get_viewport().size) / 2 - text_label.size / 2 + Vector2(0, -200)
+	var timer = Timer.new()
+	timer.one_shot = true
+	timer.wait_time = time
+	timer.autostart = true
+	timer.timeout.connect(func():
+		text_label.queue_free() # Remove the popup after the timer
+	)
+	add_child(timer)
+	pass
