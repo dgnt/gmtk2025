@@ -10,12 +10,12 @@ func _ready() -> void:
 	$Dachshund.hoop_control_allowed = false
 	var zoom = 1.7
 	$Dachshund/Camera.zoom = Vector2(zoom,zoom)
-	$Dachshund/Camera.limit_right = $Dachshund/Camera.limit_left + int(Vector2(get_viewport().size).x / zoom) + 1
+	$Dachshund/Camera.limit_right = $Dachshund/Camera.limit_left + int(Constants.GAMESIZE.x / zoom) + 1
 	#$Dachshund/Camera.limit_top /= zoom
 	for child in find_children("", "Parallax2D"):
 		if child.name.begins_with("Clouds"):
 			continue
-		child.scroll_offset.y = (-1080.0 / 2 + 32) * child.scroll_scale.y
+		child.scroll_offset.y = (-Constants.GAMESIZE.y / 2 + 32) * child.scroll_scale.y
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:

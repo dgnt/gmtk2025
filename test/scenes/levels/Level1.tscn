@@ -48,7 +48,7 @@ tile_set = ExtResource("3_jei7p")
 z_index = -90
 scroll_scale = Vector2(0.15, 0)
 repeat_size = Vector2(1200, 0)
-repeat_times = 2
+repeat_times = 5
 
 [node name="Sprite2D2" type="Sprite2D" parent="City Skyline"]
 position = Vector2(549.5, 424)
@@ -71,12 +71,17 @@ tile_set = ExtResource("3_jei7p")
 [node name="Treeline" type="Parallax2D" parent="."]
 z_index = -20
 scroll_scale = Vector2(0.25, 0)
-repeat_size = Vector2(800, 0)
+repeat_size = Vector2(1836, 0)
 repeat_times = 3
 
 [node name="Sprite2D3" type="Sprite2D" parent="Treeline"]
-position = Vector2(1100, 770)
-scale = Vector2(2, 1.5)
+position = Vector2(0, 770)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("5_s04li")
+
+[node name="Sprite2D4" type="Sprite2D" parent="Treeline"]
+position = Vector2(918, 770)
+scale = Vector2(-1.5, 1.5)
 texture = ExtResource("5_s04li")
 
 [node name="Tree" type="Parallax2D" parent="."]

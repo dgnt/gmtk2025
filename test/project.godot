@@ -24,6 +24,7 @@ buses/default_bus_layout="res://resources/default_bus_layout.tres"
 GameFlow="*res://scripts/autoload/game_flow.gd"
 UIOverlay="*res://scripts/autoload/ui_overlay_manager.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
+Constants="*res://scripts/autoload/constants.gd"
 
 [display]
 

@@ -24,9 +24,9 @@ func calc_camera_bounds():
 	var map_limits = tilemap.get_used_rect()
 	var map_cellsize = tilemap.tile_set.tile_size
 	limit_left = 0
-	limit_right = 1920
+	limit_right = Constants.GAMESIZE.x
 	limit_top = 0
-	limit_bottom = 1080
+	limit_bottom = Constants.GAMESIZE.y
 	
 	for layer in tilemap.get_children():
 		if layer is not TileMapLayer:
@@ -40,12 +40,12 @@ func calc_camera_bounds():
 		limit_top = min(limit_top, map_limits.position.y * map_cellsize.y)
 		limit_bottom = max(limit_bottom, map_limits.end.y * map_cellsize.y)
 	
-	if get_viewport().size.x > (limit_right - limit_left):
-		limit_left -= (get_viewport().size.x - (limit_right - limit_left))/2 + 1
-		limit_right += (get_viewport().size.x - (limit_right - limit_left))/2 + 1
-	if get_viewport().size.y > (limit_bottom - limit_top):
-		limit_top -= (get_viewport().size.y - (limit_bottom - limit_top))/2 + 1
-		limit_bottom += (get_viewport().size.y - (limit_bottom - limit_top))/2 + 1
+	if Constants.GAMESIZE.x > (limit_right - limit_left):
+		limit_left -= (Constants.GAMESIZE.x - (limit_right - limit_left))/2 + 1
+		limit_right += (Constants.GAMESIZE.x - (limit_right - limit_left))/2 + 1
+	if Constants.GAMESIZE.y > (limit_bottom - limit_top):
+		limit_top -= (Constants.GAMESIZE.y - (limit_bottom - limit_top))/2 + 1
+		limit_bottom += (Constants.GAMESIZE.y - (limit_bottom - limit_top))/2 + 1
 	
 	#print(limit_left)
 	#print(limit_right)
