@@ -133,6 +133,15 @@ func _on_button_unhover(button: Button):
 		if current_hovered_button == null:
 			hula_hoop.visible = false
 
+# Custom input handling for game actions in menu
+func _input(event):
+	if event.is_action_pressed("jump"):
+		# Activate the currently focused button
+		var focused_control = get_viewport().gui_get_focus_owner()
+		if focused_control is Button:
+			focused_control.pressed.emit()
+			get_viewport().set_input_as_handled()
+
 # Focus handlers for controller/keyboard navigation
 func _on_button_focus_entered(button: Button, bone_name: String):
 	# Show hula hoop when button gets focus via keyboard/controller
