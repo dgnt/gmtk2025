@@ -36,8 +36,6 @@ var hoop_system: HulaHoopSystem
 var visual_node: Node2D
 var front_line: Line2D
 var back_line: Line2D
-var left_distortion: ColorRect
-var right_distortion: ColorRect
 var hoop_light: PointLight2D
 
 # Internal state
@@ -85,9 +83,6 @@ func setup_visual_components():
 	visual_node.name = "Visual"
 	add_child(visual_node)
 	
-	# Create distortion effects for left and right edges
-	setup_distortion_effects()
-	
 	# Create back half line
 	back_line = Line2D.new()
 	back_line.name = "BackHalf"
@@ -125,30 +120,6 @@ func setup_light():
 	if light_texture:
 		hoop_light.texture = light_texture
 	visual_node.add_child(hoop_light)
-
-func setup_distortion_effects():
-	# Load the air distortion material
-	var distortion_material = load("res://assets/materials/air_distortion_material.tres")
-	
-	# Create left edge distortion
-	left_distortion = ColorRect.new()
-	left_distortion.name = "LeftDistortion"
-	left_distortion.material = distortion_material
-	left_distortion.size = Vector2(200, 200)
-	left_distortion.position = Vector2(-100, -100)
-	left_distortion.z_index = -3
-	left_distortion.color = Color(1, 1, 1, 0)  # Transparent
-	visual_node.add_child(left_distortion)
-	
-	# Create right edge distortion
-	right_distortion = ColorRect.new()
-	right_distortion.name = "RightDistortion"
-	right_distortion.material = distortion_material.duplicate()
-	right_distortion.size = Vector2(200, 200)
-	right_distortion.position = Vector2(-100, -100)
-	right_distortion.z_index = -3
-	right_distortion.color = Color(1, 1, 1, 0)  # Transparent
-	visual_node.add_child(right_distortion)
 
 func setup_hoop_system():
 	# Prevent duplicate hoop system
@@ -304,29 +275,6 @@ func update_hoop_lines():
 	back_line.default_color = color_back
 	front_line.width = line_width
 	back_line.width = line_width
-	
-	# Update distortion effect positions and strength
-	if left_distortion and right_distortion:
-		# Find the actual leftmost and rightmost points after stretch
-		var left_pos = Vector2(-half_width, 0)
-		var right_pos = Vector2(half_width, 0)
-		
-		if is_stretching:
-			# The distortion positions should match the current hoop width
-			# Since hoop_width is already being lerped in update_stretch_animation
-			left_pos = Vector2(-hoop_width / 2.0, 0)
-			right_pos = Vector2(hoop_width / 2.0, 0)
-		
-		left_distortion.position = left_pos - left_distortion.size / 2.0
-		right_distortion.position = right_pos - right_distortion.size / 2.0
-		
-		# Increase distortion strength when stretching
-		if is_stretching and left_distortion.material and right_distortion.material:
-			# Calculate distortion based on how much we've stretched
-			var stretch_amount = (hoop_width - original_hoop_width) / original_hoop_width if original_hoop_width > 0 else 0.0
-			var distortion_strength = 0.01 + stretch_amount * 0.02
-			left_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
-			right_distortion.material.set_shader_parameter("distortion_strength", distortion_strength)
 
 func rotate_point(point: Vector2, angle: float) -> Vector2:
 	return point.rotated(angle)
@@ -502,12 +450,6 @@ func end_stretch():
 	
 	# Reset snap distance
 	snap_distance = 0.0
-	
-	# Reset distortion strength
-	if left_distortion and left_distortion.material:
-		left_distortion.material.set_shader_parameter("distortion_strength", 0.01)
-	if right_distortion and right_distortion.material:
-		right_distortion.material.set_shader_parameter("distortion_strength", 0.01)
 	
 	update_hoop_visual()
 
