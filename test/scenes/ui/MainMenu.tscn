@@ -95,16 +95,16 @@ stretch_mode = 5
 [node name="Skeleton2D" type="Skeleton2D" parent="."]
 
 [node name="PlayBone" type="Bone2D" parent="Skeleton2D"]
-position = Vector2(959, 502)
-rest = Transform2D(1, 0, 0, 1, 959, 502)
+position = Vector2(960, 505)
+rest = Transform2D(1, 0, 0, 1, 960, 505)
 
 [node name="SettingsBone" type="Bone2D" parent="Skeleton2D"]
-position = Vector2(959, 542)
-rest = Transform2D(1, 0, 0, 1, 959, 542)
+position = Vector2(960, 573)
+rest = Transform2D(1, 0, 0, 1, 960, 573)
 
 [node name="DebugBone" type="Bone2D" parent="Skeleton2D"]
-position = Vector2(960, 579)
-rest = Transform2D(1, 0, 0, 1, 960, 579)
+position = Vector2(960, 636)
+rest = Transform2D(1, 0, 0, 1, 960, 636)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0
@@ -119,12 +119,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -35.0
-offset_top = -50.5
-offset_right = 35.0
-offset_bottom = 50.5
+offset_left = -47.0
+offset_top = -56.0
+offset_right = 46.0
+offset_bottom = 106.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 30
 alignment = 1
 
 [node name="PlayButton" type="Button" parent="VBoxContainer"]
